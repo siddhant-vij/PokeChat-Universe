@@ -8,28 +8,33 @@ all: build
 
 build:
 	@echo "Building..."
+	@go mod tidy
 	@go build -o main cmd/api/main.go
 
 
 # Run the application
 run:
+	@go mod tidy
 	@go run cmd/api/main.go
 
 
 # Test the application
 test:
 	@echo "Testing..."
+	@go mod tidy
 	@go test ./... -v
 
 
 # Clean the binary
 clean:
 	@echo "Cleaning..."
+	@go mod tidy
 	@rm -f main
 
 
 # Live Reload
 watch:
+	@go mod tidy
 	@if which air > /dev/null; then \
             air; \
             echo "Watching...";\
