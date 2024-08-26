@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -21,42 +22,88 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getUserByAuthID = `-- name: GetUserByAuthID :one
+SELECT id, created_at, updated_at, auth_id, username, email, picture_url FROM users
+WHERE auth_id = $1 LIMIT 1
+`
+
+func (q *Queries) GetUserByAuthID(ctx context.Context, authID string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByAuthID, authID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.AuthID,
+		&i.Username,
+		&i.Email,
+		&i.PictureUrl,
+	)
+	return i, err
+}
+
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, created_at, email FROM users
+SELECT id, created_at, updated_at, auth_id, username, email, picture_url FROM users
 WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserByID, id)
 	var i User
-	err := row.Scan(&i.ID, &i.CreatedAt, &i.Email)
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.AuthID,
+		&i.Username,
+		&i.Email,
+		&i.PictureUrl,
+	)
 	return i, err
 }
 
 const insertUser = `-- name: InsertUser :one
 INSERT INTO users
-  (id, email)
+  (id, auth_id, username, email, picture_url)
 VALUES
-  ($1, $2)
-RETURNING id, created_at, email
+  ($1, $2, $3, $4, $5)
+RETURNING id, created_at, updated_at, auth_id, username, email, picture_url
 `
 
 type InsertUserParams struct {
-	ID    uuid.UUID
-	Email string
+	ID         uuid.UUID
+	AuthID     string
+	Username   string
+	Email      string
+	PictureUrl sql.NullString
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, insertUser, arg.ID, arg.Email)
+	row := q.db.QueryRowContext(ctx, insertUser,
+		arg.ID,
+		arg.AuthID,
+		arg.Username,
+		arg.Email,
+		arg.PictureUrl,
+	)
 	var i User
-	err := row.Scan(&i.ID, &i.CreatedAt, &i.Email)
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.AuthID,
+		&i.Username,
+		&i.Email,
+		&i.PictureUrl,
+	)
 	return i, err
 }
 
 const updateUserEmailByID = `-- name: UpdateUserEmailByID :exec
 UPDATE users
 SET
-  email = $2
+  email = $2,
+  updated_at = NOW()
 WHERE id = $1
 `
 

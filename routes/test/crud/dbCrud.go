@@ -2,6 +2,7 @@ package crud
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"net/http"
 
@@ -11,12 +12,24 @@ import (
 	"github.com/siddhant-vij/PokeChat-Universe/database"
 )
 
-var testUserId = uuid.New()
+var (
+	testUserId   = uuid.New()
+	testAuthID   = "testAuthID"
+	testUsername = "testUser"
+	testEmail    = "test@email.com"
+	testPicUrl   = "testPictureUrl"
+)
 
 func DbCreateHandler(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	testUser := database.InsertUserParams{
-		ID:    testUserId,
-		Email: "test@email.com",
+		ID:       testUserId,
+		AuthID:   testAuthID,
+		Username: testUsername,
+		Email:    testEmail,
+		PictureUrl: sql.NullString{
+			String: testPicUrl,
+			Valid:  true,
+		},
 	}
 
 	user, err := cfg.DBQueries.InsertUser(context.Background(), testUser)

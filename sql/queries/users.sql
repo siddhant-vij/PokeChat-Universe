@@ -1,18 +1,23 @@
 -- name: InsertUser :one
 INSERT INTO users
-  (id, email)
+  (id, auth_id, username, email, picture_url)
 VALUES
-  ($1, $2)
+  ($1, $2, $3, $4, $5)
 RETURNING *;
 
 -- name: GetUserByID :one
 SELECT * FROM users
 WHERE id = $1 LIMIT 1;
 
+-- name: GetUserByAuthID :one
+SELECT * FROM users
+WHERE auth_id = $1 LIMIT 1;
+
 -- name: UpdateUserEmailByID :exec
 UPDATE users
 SET
-  email = $2
+  email = $2,
+  updated_at = NOW()
 WHERE id = $1;
 
 -- name: DeleteUserByID :exec
