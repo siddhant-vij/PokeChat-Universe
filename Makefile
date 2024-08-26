@@ -27,7 +27,7 @@ clean:
 	@go clean
 
 # Live reload with air (install air if not available)
-watch:
+watch: build
 	@echo "Starting live reload..."
 	@scripts/up.sh
 	@if which air > /dev/null; then \
@@ -49,7 +49,7 @@ watch:
 up:
 	@scripts/up.sh
 
-down:
+down: clean
 	@scripts/down.sh
 
 .PHONY: all build run clean watch up down
