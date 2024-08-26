@@ -1,4 +1,4 @@
-package postgres
+package config
 
 import (
 	"context"
@@ -9,42 +9,37 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
-
-	"github.com/siddhant-vij/PokeChat-Universe/config"
-	"github.com/siddhant-vij/PokeChat-Universe/services"
 )
 
-type Service struct {
-	DB *sql.DB
+type DbService struct {
+	DatabaseClient *sql.DB
 }
 
-var (
-	dbInstance *Service
-)
+var dbServiceInstance *DbService
 
-func New(cfg *config.AppConfig) services.Service {
-	if dbInstance != nil {
-		return dbInstance
+func NewDatabaseService(cfg *AppConfig) *DbService {
+	if dbServiceInstance != nil {
+		return dbServiceInstance
 	}
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatalf("error connecting to database. Err: %v", err)
 	}
-	dbInstance = &Service{
-		DB: db,
+	dbServiceInstance = &DbService{
+		DatabaseClient: db,
 	}
-	return dbInstance
+	return dbServiceInstance
 }
 
-func (s *Service) Health() map[string]string {
+func (s *DbService) Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	stats := make(map[string]string)
 
 	// Ping the database
-	err := s.DB.PingContext(ctx)
+	err := s.DatabaseClient.PingContext(ctx)
 	if err != nil {
 		stats["status"] = "down"
 		stats["error"] = fmt.Sprintf("db down: %v", err)
@@ -57,7 +52,7 @@ func (s *Service) Health() map[string]string {
 	stats["message"] = "It's healthy"
 
 	// Get database stats (like open connections, in use, idle, etc.)
-	dbStats := s.DB.Stats()
+	dbStats := s.DatabaseClient.Stats()
 	stats["open_connections"] = strconv.Itoa(dbStats.OpenConnections)
 	stats["in_use"] = strconv.Itoa(dbStats.InUse)
 	stats["idle"] = strconv.Itoa(dbStats.Idle)
@@ -86,7 +81,7 @@ func (s *Service) Health() map[string]string {
 	return stats
 }
 
-func (s *Service) Close(cfg *config.AppConfig) error {
+func (s *DbService) Close(cfg *AppConfig) error {
 	log.Printf("Disconnected from database: %s", cfg.DBName)
-	return s.DB.Close()
+	return s.DatabaseClient.Close()
 }

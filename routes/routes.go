@@ -1,41 +1,29 @@
 package routes
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/siddhant-vij/PokeChat-Universe/config"
 	"github.com/siddhant-vij/PokeChat-Universe/database"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/crud"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/health"
-	"github.com/siddhant-vij/PokeChat-Universe/services"
-	"github.com/siddhant-vij/PokeChat-Universe/services/postgres"
-	"github.com/siddhant-vij/PokeChat-Universe/services/redis"
 )
 
 var (
 	appConfig    *config.AppConfig
-	dbService    services.Service
-	redisService services.Service
+	dbService    *config.DbService
+	redisService *config.RedisService
 )
 
 func init() {
 	appConfig = &config.AppConfig{}
 	config.LoadEnv(appConfig)
 
-	dbService = postgres.New(appConfig)
-	tDB, ok := dbService.(*postgres.Service)
-	if !ok {
-		log.Fatalf("expected dbService to be postgres.Service, got %T", dbService)
-	}
-	appConfig.DBQueries = database.New(tDB.DB)
+	dbService = config.NewDatabaseService(appConfig)
+	appConfig.DBQueries = database.New(dbService.DatabaseClient)
 
-	redisService = redis.New(appConfig)
-	rDB, ok := redisService.(*redis.Service)
-	if !ok {
-		log.Fatalf("expected redisService to be redis.Service, got %T", redisService)
-	}
-	appConfig.RedisClient = rDB.Redis
+	redisService = config.NewRedisService(appConfig)
+	appConfig.RedisClient = redisService.RedisClient
 }
 
 func RegisterRoutes(mux *http.ServeMux) {
@@ -48,11 +36,11 @@ func HealthHandlers(mux *http.ServeMux) {
 	mux.HandleFunc("/health", health.ServerHealthHandler)
 
 	mux.HandleFunc("/dbHealth", func(w http.ResponseWriter, r *http.Request) {
-		health.ServiceConnectionHealthHandler(w, r, dbService)
+		health.DatabaseConnectionHealthHandler(w, r, dbService)
 	})
 
 	mux.HandleFunc("/redisHealth", func(w http.ResponseWriter, r *http.Request) {
-		health.ServiceConnectionHealthHandler(w, r, redisService)
+		health.RedisConnectionHealthHandler(w, r, redisService)
 	})
 }
 

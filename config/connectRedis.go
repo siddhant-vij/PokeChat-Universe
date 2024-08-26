@@ -1,4 +1,4 @@
-package redis
+package config
 
 import (
 	"context"
@@ -10,22 +10,17 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-
-	"github.com/siddhant-vij/PokeChat-Universe/config"
-	"github.com/siddhant-vij/PokeChat-Universe/services"
 )
 
-type Service struct {
-	Redis *redis.Client
+type RedisService struct {
+	RedisClient *redis.Client
 }
 
-var (
-	redisInstance *Service
-)
+var redisServiceInstance *RedisService
 
-func New(cfg *config.AppConfig) services.Service {
-	if redisInstance != nil {
-		return redisInstance
+func NewRedisService(cfg *AppConfig) *RedisService {
+	if redisServiceInstance != nil {
+		return redisServiceInstance
 	}
 	num, err := strconv.Atoi(cfg.RedisDatabase)
 	if err != nil {
@@ -37,13 +32,13 @@ func New(cfg *config.AppConfig) services.Service {
 		DB:       num,
 		Password: cfg.RedisPassword,
 	})
-	redisInstance = &Service{
-		Redis: rdb,
+	redisServiceInstance = &RedisService{
+		RedisClient: rdb,
 	}
-	return redisInstance
+	return redisServiceInstance
 }
 
-func (s *Service) Health() map[string]string {
+func (s *RedisService) Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
@@ -54,9 +49,9 @@ func (s *Service) Health() map[string]string {
 	return stats
 }
 
-func (s *Service) checkRedisHealth(ctx context.Context, stats map[string]string) map[string]string {
+func (s *RedisService) checkRedisHealth(ctx context.Context, stats map[string]string) map[string]string {
 	// Ping the Redis server to check its availability.
-	pong, err := s.Redis.Ping(ctx).Result()
+	pong, err := s.RedisClient.Ping(ctx).Result()
 	if err != nil {
 		log.Fatalf("redis down: %v", err)
 	}
@@ -67,7 +62,7 @@ func (s *Service) checkRedisHealth(ctx context.Context, stats map[string]string)
 	stats["redis_ping_response"] = pong
 
 	// Retrieve Redis server information.
-	info, err := s.Redis.Info(ctx).Result()
+	info, err := s.RedisClient.Info(ctx).Result()
 	if err != nil {
 		stats["redis_message"] = fmt.Sprintf("Failed to retrieve Redis info: %v", err)
 		return stats
@@ -77,7 +72,7 @@ func (s *Service) checkRedisHealth(ctx context.Context, stats map[string]string)
 	redisInfo := parseRedisInfo(info)
 
 	// Get the pool stats of the Redis client.
-	poolStats := s.Redis.PoolStats()
+	poolStats := s.RedisClient.PoolStats()
 
 	// Prepare the stats map with Redis server information and pool statistics.
 	stats["redis_version"] = redisInfo["redis_version"]
@@ -99,7 +94,7 @@ func (s *Service) checkRedisHealth(ctx context.Context, stats map[string]string)
 	stats["redis_active_connections"] = strconv.FormatUint(activeConns, 10)
 
 	// Calculate the pool size percentage.
-	poolSize := s.Redis.Options().PoolSize
+	poolSize := s.RedisClient.Options().PoolSize
 	connectedClients, _ := strconv.Atoi(redisInfo["connected_clients"])
 	poolSizePercentage := float64(connectedClients) / float64(poolSize) * 100
 	stats["redis_pool_size_percentage"] = fmt.Sprintf("%.2f%%", poolSizePercentage)
@@ -108,9 +103,9 @@ func (s *Service) checkRedisHealth(ctx context.Context, stats map[string]string)
 	return s.evaluateRedisStats(redisInfo, stats)
 }
 
-func (s *Service) evaluateRedisStats(redisInfo, stats map[string]string) map[string]string {
-	poolSize := s.Redis.Options().PoolSize
-	poolStats := s.Redis.PoolStats()
+func (s *RedisService) evaluateRedisStats(redisInfo, stats map[string]string) map[string]string {
+	poolSize := s.RedisClient.Options().PoolSize
+	poolStats := s.RedisClient.PoolStats()
 	connectedClients, _ := strconv.Atoi(redisInfo["connected_clients"])
 	highConnectionThreshold := int(float64(poolSize) * 0.8)
 
@@ -172,7 +167,7 @@ func parseRedisInfo(info string) map[string]string {
 	return result
 }
 
-func (s *Service) Close(cfg *config.AppConfig) error {
+func (s *RedisService) Close(cfg *AppConfig) error {
 	log.Printf("Disconnected from database: %s", cfg.RedisDatabase)
-	return s.Redis.Close()
+	return s.RedisClient.Close()
 }
