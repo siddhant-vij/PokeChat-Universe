@@ -7,22 +7,18 @@ package database
 
 import (
 	"context"
-	"time"
 
 	"github.com/google/uuid"
 )
 
-const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, created_at, email FROM users
-WHERE email = $1
-LIMIT 1
+const deleteUserByID = `-- name: DeleteUserByID :exec
+DELETE FROM users
+WHERE id = $1
 `
 
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
-	var i User
-	err := row.Scan(&i.ID, &i.CreatedAt, &i.Email)
-	return i, err
+func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteUserByID, id)
+	return err
 }
 
 const getUserByID = `-- name: GetUserByID :one
@@ -39,21 +35,37 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 
 const insertUser = `-- name: InsertUser :one
 INSERT INTO users
-  (id, created_at, email)
+  (id, email)
 VALUES
-  ($1, $2, $3)
+  ($1, $2)
 RETURNING id, created_at, email
 `
 
 type InsertUserParams struct {
-	ID        uuid.UUID
-	CreatedAt time.Time
-	Email     string
+	ID    uuid.UUID
+	Email string
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, insertUser, arg.ID, arg.CreatedAt, arg.Email)
+	row := q.db.QueryRowContext(ctx, insertUser, arg.ID, arg.Email)
 	var i User
 	err := row.Scan(&i.ID, &i.CreatedAt, &i.Email)
 	return i, err
+}
+
+const updateUserEmailByID = `-- name: UpdateUserEmailByID :exec
+UPDATE users
+SET
+  email = $2
+WHERE id = $1
+`
+
+type UpdateUserEmailByIDParams struct {
+	ID    uuid.UUID
+	Email string
+}
+
+func (q *Queries) UpdateUserEmailByID(ctx context.Context, arg UpdateUserEmailByIDParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserEmailByID, arg.ID, arg.Email)
+	return err
 }
