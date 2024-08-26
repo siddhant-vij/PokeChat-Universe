@@ -1,6 +1,10 @@
 package services
 
+import (
+	"github.com/siddhant-vij/PokeChat-Universe/config"
+)
+
 type Service interface {
 	Health() map[string]string
-	Close() error
+	Close(cfg *config.AppConfig) error
 }

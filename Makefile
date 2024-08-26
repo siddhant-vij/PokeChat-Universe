@@ -1,40 +1,35 @@
-# Simple Makefile for a Go project
+# Include environment variables
 include $(PWD)/.env
+
+# Update PATH to include Go binaries
 PATH := $(USER_HOME)/go/bin:$(PATH)
 
-
-# Build the application
+# Default target is to build the application
 all: build
 
+# Build the application
 build:
-	@echo "Building..."
+	@echo "Building the application..."
 	@go mod tidy
+	@scripts/sqlc.sh
 	@go build -o main cmd/api/main.go
 
-
-# Run the application
-run:
-	@go mod tidy
+# Run the application (including setup and migrations)
+run: build
+	@echo "Running the application..."
+	@scripts/up.sh
 	@go run cmd/api/main.go
 
-
-# Test the application
-test:
-	@echo "Testing..."
-	@go mod tidy
-	@go test ./... -v
-
-
-# Clean the binary
+# Clean the build artifacts
 clean:
-	@echo "Cleaning..."
-	@go mod tidy
+	@echo "Cleaning build artifacts..."
 	@rm -f main
+	@go clean
 
-
-# Live Reload
+# Live reload with air (install air if not available)
 watch:
-	@go mod tidy
+	@echo "Starting live reload..."
+	@scripts/up.sh
 	@if which air > /dev/null; then \
             air; \
             echo "Watching...";\
@@ -50,5 +45,11 @@ watch:
             fi; \
         fi
 
+# Database migration setup (for convenience)
+up:
+	@scripts/up.sh
 
-.PHONY: all build run test clean watch
+down:
+	@scripts/down.sh
+
+.PHONY: all build run clean watch up down

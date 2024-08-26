@@ -5,52 +5,46 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"
 
+	"github.com/siddhant-vij/PokeChat-Universe/config"
 	"github.com/siddhant-vij/PokeChat-Universe/services"
 )
 
-type service struct {
-	db *sql.DB
+type Service struct {
+	DB *sql.DB
 }
 
 var (
-	host       = os.Getenv("DB_HOST")
-	port       = os.Getenv("DB_PORT")
-	database   = os.Getenv("DB_DATABASE")
-	username   = os.Getenv("DB_USERNAME")
-	password   = os.Getenv("DB_PASSWORD")
-	dbInstance *service
+	dbInstance *Service
 )
 
-func New() services.Service {
+func New(cfg *config.AppConfig) services.Service {
 	if dbInstance != nil {
 		return dbInstance
 	}
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", username, password, host, port, database)
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatalf("error connecting to database. Err: %v", err)
 	}
-	dbInstance = &service{
-		db: db,
+	dbInstance = &Service{
+		DB: db,
 	}
 	return dbInstance
 }
 
-func (s *service) Health() map[string]string {
+func (s *Service) Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	stats := make(map[string]string)
 
 	// Ping the database
-	err := s.db.PingContext(ctx)
+	err := s.DB.PingContext(ctx)
 	if err != nil {
 		stats["status"] = "down"
 		stats["error"] = fmt.Sprintf("db down: %v", err)
@@ -63,7 +57,7 @@ func (s *service) Health() map[string]string {
 	stats["message"] = "It's healthy"
 
 	// Get database stats (like open connections, in use, idle, etc.)
-	dbStats := s.db.Stats()
+	dbStats := s.DB.Stats()
 	stats["open_connections"] = strconv.Itoa(dbStats.OpenConnections)
 	stats["in_use"] = strconv.Itoa(dbStats.InUse)
 	stats["idle"] = strconv.Itoa(dbStats.Idle)
@@ -92,7 +86,7 @@ func (s *service) Health() map[string]string {
 	return stats
 }
 
-func (s *service) Close() error {
-	log.Printf("Disconnected from database: %s", database)
-	return s.db.Close()
+func (s *Service) Close(cfg *config.AppConfig) error {
+	log.Printf("Disconnected from database: %s", cfg.DBName)
+	return s.DB.Close()
 }
