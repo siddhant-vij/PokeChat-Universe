@@ -66,6 +66,7 @@ INSERT INTO users
   (id, auth_id, username, email, picture_url)
 VALUES
   ($1, $2, $3, $4, $5)
+ON CONFLICT (auth_id) DO NOTHING
 `
 
 type InsertUserParams struct {
