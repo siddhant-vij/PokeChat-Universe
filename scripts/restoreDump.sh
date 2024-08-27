@@ -4,6 +4,8 @@ source .env
 
 # psql -U $DB_USERNAME
 # DROP DATABASE $DB_DATABASE;
+psql -U $DB_USERNAME -c 'DROP DATABASE pokechat;'
 # CREATE DATABASE $DB_DATABASE;
+psql -U $DB_USERNAME -c 'CREATE DATABASE pokechat;'
 
 psql -U $DB_USERNAME $DB_DATABASE < pgDump_$DB_DATABASE.sql
