@@ -15,14 +15,8 @@ func IsAuthenticated(next http.Handler, auth *auth.Authenticator, cfg *config.Ap
 			return
 		}
 
-		token, ok := cfg.SessionTokenMap[sessionId.Value]
+		_, ok := cfg.SessionTokenMap[sessionId.Value]
 		if !ok {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
-
-		_, err = auth.VerifyIDToken(r.Context(), token)
-		if err != nil {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
