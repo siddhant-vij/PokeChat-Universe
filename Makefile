@@ -50,6 +50,7 @@ up:
 	@scripts/up.sh
 
 down: clean
+	@scripts/pgDump.sh
 	@scripts/down.sh
 
 .PHONY: all build run clean watch up down
