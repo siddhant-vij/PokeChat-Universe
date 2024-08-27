@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"time"
 
 	"github.com/lib/pq"
 )
@@ -166,6 +167,7 @@ SET
   special_attack = $11,
   special_defense = $12,
   speed = $13,
+  created_at = $14,
   updated_at = NOW()
 WHERE id = $1
 `
@@ -184,6 +186,7 @@ type UpdatePokemonByIDParams struct {
 	SpecialAttack  int32
 	SpecialDefense int32
 	Speed          int32
+	CreatedAt      time.Time
 }
 
 func (q *Queries) UpdatePokemonByID(ctx context.Context, arg UpdatePokemonByIDParams) error {
@@ -201,6 +204,7 @@ func (q *Queries) UpdatePokemonByID(ctx context.Context, arg UpdatePokemonByIDPa
 		arg.SpecialAttack,
 		arg.SpecialDefense,
 		arg.Speed,
+		arg.CreatedAt,
 	)
 	return err
 }

@@ -37,6 +37,7 @@ SET
   special_attack = $11,
   special_defense = $12,
   speed = $13,
+  created_at = $14,
   updated_at = NOW()
 WHERE id = $1;
 

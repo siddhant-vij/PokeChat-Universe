@@ -2,7 +2,8 @@
 INSERT INTO evolutions
   (chain_id, pokemon_id, evolves_to_id)
 VALUES
-  ($1, $2, $3);
+  ($1, $2, $3)
+ON CONFLICT (chain_id, pokemon_id) DO NOTHING;
 
 -- name: GetFullEvolutionChain :many
 WITH simple_chain AS (

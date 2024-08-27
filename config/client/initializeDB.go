@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/siddhant-vij/PokeChat-Universe/config"
 	"github.com/siddhant-vij/PokeChat-Universe/database"
@@ -136,6 +138,96 @@ func insertPokemonDataIntoDB(cfg *config.AppConfig, pokemonData pokemonFromAPI) 
 
 	cfg.Mutex.Lock()
 	err := cfg.DBQueries.InsertPokemon(context.Background(), insertPokemonParams)
+	cfg.Mutex.Unlock()
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			pokemonToBeUpdated, ok := isPokemonUpdatable(insertPokemonParams, cfg)
+			if ok {
+				updatePokemonById(pokemonToBeUpdated, cfg)
+			} else {
+				// Ignore if pokemon is not updatable. It exists in DB with same info coming from API.
+			}
+		} else {
+			return err
+		}
+	}
+	return nil
+}
+
+type updatePokemonDB struct {
+	insertParam database.InsertPokemonParams
+	CreatedAt   time.Time
+}
+
+func isPokemonUpdatable(insertPokemonParams database.InsertPokemonParams, cfg *config.AppConfig) (updatePokemonDB, bool) {
+	var updateParams updatePokemonDB
+	updateParams.insertParam = insertPokemonParams
+
+	pokemonFromDB, err := getPokemonDataById(insertPokemonParams.ID, cfg)
+	if err != nil {
+		updateParams = updatePokemonDB{
+			CreatedAt: time.Now(),
+		}
+		return updateParams, true
+	}
+
+	updateParams = updatePokemonDB{
+		CreatedAt: pokemonFromDB.CreatedAt,
+	}
+
+	if len(pokemonFromDB.Types) != len(insertPokemonParams.Types) {
+		return updateParams, true
+	}
+	for i := 0; i < len(pokemonFromDB.Types); i++ {
+		if pokemonFromDB.Types[i] != insertPokemonParams.Types[i] {
+			return updateParams, true
+		}
+	}
+	if pokemonFromDB.Name == insertPokemonParams.Name &&
+		pokemonFromDB.Height == insertPokemonParams.Height &&
+		pokemonFromDB.Weight == insertPokemonParams.Weight &&
+		pokemonFromDB.PictureUrl == insertPokemonParams.PictureUrl &&
+		pokemonFromDB.BaseExperience == insertPokemonParams.BaseExperience &&
+		pokemonFromDB.Hp == insertPokemonParams.Hp &&
+		pokemonFromDB.Attack == insertPokemonParams.Attack &&
+		pokemonFromDB.Defense == insertPokemonParams.Defense &&
+		pokemonFromDB.SpecialAttack == insertPokemonParams.SpecialAttack &&
+		pokemonFromDB.SpecialDefense == insertPokemonParams.SpecialDefense &&
+		pokemonFromDB.Speed == insertPokemonParams.Speed {
+		return updatePokemonDB{}, false
+	} else {
+		return updateParams, true
+	}
+}
+
+func getPokemonDataById(id int32, cfg *config.AppConfig) (database.Pokemon, error) {
+	cfg.Mutex.RLock()
+	pokemon, err := cfg.DBQueries.GetPokemonByID(context.Background(), id)
+	cfg.Mutex.RUnlock()
+	if err != nil {
+		return database.Pokemon{}, err
+	}
+	return pokemon, nil
+}
+
+func updatePokemonById(pokemon updatePokemonDB, cfg *config.AppConfig) error {
+	updateParams := database.UpdatePokemonByIDParams{
+		ID:             pokemon.insertParam.ID,
+		CreatedAt:      pokemon.CreatedAt,
+		Name:           pokemon.insertParam.Name,
+		Height:         pokemon.insertParam.Height,
+		Weight:         pokemon.insertParam.Weight,
+		PictureUrl:     pokemon.insertParam.PictureUrl,
+		BaseExperience: pokemon.insertParam.BaseExperience,
+		Hp:             pokemon.insertParam.Hp,
+		Attack:         pokemon.insertParam.Attack,
+		Defense:        pokemon.insertParam.Defense,
+		SpecialAttack:  pokemon.insertParam.SpecialAttack,
+		SpecialDefense: pokemon.insertParam.SpecialDefense,
+		Speed:          pokemon.insertParam.Speed,
+	}
+	cfg.Mutex.Lock()
+	err := cfg.DBQueries.UpdatePokemonByID(context.Background(), updateParams)
 	cfg.Mutex.Unlock()
 	if err != nil {
 		return err
