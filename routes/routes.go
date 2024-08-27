@@ -5,10 +5,14 @@ import (
 	"sync"
 
 	"github.com/jasonlvhit/gocron"
+	"golang.org/x/oauth2"
 
 	"github.com/siddhant-vij/PokeChat-Universe/config"
 	"github.com/siddhant-vij/PokeChat-Universe/config/client"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/auth"
 	"github.com/siddhant-vij/PokeChat-Universe/database"
+	"github.com/siddhant-vij/PokeChat-Universe/middlewares"
+	authroutes "github.com/siddhant-vij/PokeChat-Universe/routes/auth"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/crud"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/health"
 )
@@ -17,6 +21,7 @@ var (
 	appConfig    *config.AppConfig
 	dbService    *config.DbService
 	redisService *config.RedisService
+	authService  *auth.Authenticator
 )
 
 func init() {
@@ -24,6 +29,8 @@ func init() {
 	config.LoadEnv(appConfig)
 
 	appConfig.Mutex = &sync.RWMutex{}
+	appConfig.SessionTokenMap = make(map[string]*oauth2.Token)
+	appConfig.PkceCodeVerifier = oauth2.GenerateVerifier()
 
 	dbService = config.NewDatabaseService(appConfig)
 	appConfig.DBQueries = database.New(dbService.DatabaseClient)
@@ -32,6 +39,8 @@ func init() {
 	appConfig.RedisClient = redisService.RedisClient
 
 	client.FetchAndInsertRequest(appConfig)
+
+	authService = auth.NewAuthenticator(appConfig)
 }
 
 func updateDatabaseCronJob() {
@@ -46,6 +55,9 @@ func RegisterRoutes(mux *http.ServeMux) {
 	// Handlers for services setup, connections & CRUD operations
 	HealthHandlers(mux)
 	CrudHandlers(mux)
+
+	// Handlers for authentication
+	AuthHandlers(mux)
 }
 
 func HealthHandlers(mux *http.ServeMux) {
@@ -92,4 +104,34 @@ func CrudHandlers(mux *http.ServeMux) {
 	mux.HandleFunc("/redisDelete", func(w http.ResponseWriter, r *http.Request) {
 		crud.RedisDeleteHandler(w, r, appConfig)
 	})
+}
+
+func AuthHandlers(mux *http.ServeMux) {
+	mux.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`<html>
+		<body>
+			<p>Home Page | <a href="/login">Login</a></p>			
+		</body>
+		</html>`))
+	}))
+
+	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		authroutes.ServeLoginPage(w, r, authService, appConfig)
+	})
+
+	mux.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
+		authroutes.ServeCallbackPage(w, r, authService, appConfig)
+	})
+
+	mux.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
+		authroutes.HandleLogout(w, r, appConfig)
+	})
+
+	mux.Handle("/resource", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`<html>
+		<body>
+			<p>Resource Page | <a href="/logout">Logout</a></p>
+		</body>
+		</html>`))
+	}), authService, appConfig))
 }

@@ -7,20 +7,25 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func LoadEnv(config *AppConfig) {
+func LoadEnv(cfg *AppConfig) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file, Err: %v", err)
 	}
 
-	config.DBHost = os.Getenv("DB_HOST")
-	config.DBPort = os.Getenv("DB_PORT")
-	config.DBUser = os.Getenv("DB_USERNAME")
-	config.DBPassword = os.Getenv("DB_PASSWORD")
-	config.DBName = os.Getenv("DB_DATABASE")
+	cfg.DBHost = os.Getenv("DB_HOST")
+	cfg.DBPort = os.Getenv("DB_PORT")
+	cfg.DBUser = os.Getenv("DB_USERNAME")
+	cfg.DBPassword = os.Getenv("DB_PASSWORD")
+	cfg.DBName = os.Getenv("DB_DATABASE")
 
-	config.RedisPort = os.Getenv("REDIS_PORT")
-	config.RedisAddress = os.Getenv("REDIS_ADDRESS")
-	config.RedisDatabase = os.Getenv("REDIS_DATABASE")
-	config.RedisPassword = os.Getenv("REDIS_PASSWORD")
+	cfg.RedisPort = os.Getenv("REDIS_PORT")
+	cfg.RedisAddress = os.Getenv("REDIS_ADDRESS")
+	cfg.RedisDatabase = os.Getenv("REDIS_DATABASE")
+	cfg.RedisPassword = os.Getenv("REDIS_PASSWORD")
+
+	cfg.AuthDomain = os.Getenv("AUTH0_DOMAIN")
+	cfg.ClientID = os.Getenv("AUTH0_CLIENT_ID")
+	cfg.ClientSecret = os.Getenv("AUTH0_CLIENT_SECRET")
+	cfg.CallbackURL = os.Getenv("AUTH0_CALLBACK_URL")
 }
