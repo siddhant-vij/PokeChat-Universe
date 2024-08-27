@@ -6,7 +6,7 @@ CREATE TABLE users (
   auth_id VARCHAR(255) NOT NULL UNIQUE,
   username VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
-  picture_url VARCHAR(255)
+  picture_url VARCHAR(255) NOT NULL
 );
 
 -- +goose Down

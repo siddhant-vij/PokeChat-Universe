@@ -2,7 +2,6 @@ package crud
 
 import (
 	"context"
-	"database/sql"
 	"log"
 	"net/http"
 
@@ -22,22 +21,19 @@ var (
 
 func DbCreateHandler(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	testUser := database.InsertUserParams{
-		ID:       testUserId,
-		AuthID:   testAuthID,
-		Username: testUsername,
-		Email:    testEmail,
-		PictureUrl: sql.NullString{
-			String: testPicUrl,
-			Valid:  true,
-		},
+		ID:         testUserId,
+		AuthID:     testAuthID,
+		Username:   testUsername,
+		Email:      testEmail,
+		PictureUrl: testPicUrl,
 	}
 
-	user, err := cfg.DBQueries.InsertUser(context.Background(), testUser)
+	err := cfg.DBQueries.InsertUser(context.Background(), testUser)
 	if err != nil {
 		log.Fatalf("error inserting user. Err: %v", err)
 	}
 
-	w.Write([]byte(user.Email + " is inserted in the database!"))
+	w.Write([]byte(testUser.Username + " is inserted in the database!"))
 }
 
 func DbReadHandler(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {

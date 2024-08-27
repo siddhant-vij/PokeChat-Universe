@@ -7,7 +7,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -62,12 +61,11 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
-const insertUser = `-- name: InsertUser :one
+const insertUser = `-- name: InsertUser :exec
 INSERT INTO users
   (id, auth_id, username, email, picture_url)
 VALUES
   ($1, $2, $3, $4, $5)
-RETURNING id, created_at, updated_at, auth_id, username, email, picture_url
 `
 
 type InsertUserParams struct {
@@ -75,28 +73,18 @@ type InsertUserParams struct {
 	AuthID     string
 	Username   string
 	Email      string
-	PictureUrl sql.NullString
+	PictureUrl string
 }
 
-func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, insertUser,
+func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
+	_, err := q.db.ExecContext(ctx, insertUser,
 		arg.ID,
 		arg.AuthID,
 		arg.Username,
 		arg.Email,
 		arg.PictureUrl,
 	)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.AuthID,
-		&i.Username,
-		&i.Email,
-		&i.PictureUrl,
-	)
-	return i, err
+	return err
 }
 
 const updateUserEmailByID = `-- name: UpdateUserEmailByID :exec

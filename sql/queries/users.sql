@@ -1,9 +1,8 @@
--- name: InsertUser :one
+-- name: InsertUser :exec
 INSERT INTO users
   (id, auth_id, username, email, picture_url)
 VALUES
-  ($1, $2, $3, $4, $5)
-RETURNING *;
+  ($1, $2, $3, $4, $5);
 
 -- name: GetUserByID :one
 SELECT * FROM users

@@ -11,6 +11,33 @@ import (
 	"github.com/google/uuid"
 )
 
+type Evolution struct {
+	ID          int32
+	ChainID     int32
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	PokemonID   int32
+	EvolvesToID sql.NullInt32
+}
+
+type Pokemon struct {
+	ID             int32
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	Name           string
+	Height         int32
+	Weight         int32
+	PictureUrl     string
+	BaseExperience int32
+	Types          []string
+	Hp             int32
+	Attack         int32
+	Defense        int32
+	SpecialAttack  int32
+	SpecialDefense int32
+	Speed          int32
+}
+
 type User struct {
 	ID         uuid.UUID
 	CreatedAt  time.Time
@@ -18,5 +45,5 @@ type User struct {
 	AuthID     string
 	Username   string
 	Email      string
-	PictureUrl sql.NullString
+	PictureUrl string
 }
