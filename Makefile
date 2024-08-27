@@ -9,6 +9,8 @@ all: build
 
 # Build the application
 build:
+	@echo "Building the database..."
+	@scripts/restoreDump.sh
 	@echo "Building the application..."
 	@go mod tidy
 	@scripts/sqlc.sh
@@ -50,7 +52,6 @@ up:
 	@scripts/up.sh
 
 down: clean
-	@scripts/pgDump.sh
 	@scripts/down.sh
 
 .PHONY: all build run clean watch up down
