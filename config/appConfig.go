@@ -2,9 +2,9 @@ package config
 
 import (
 	"sync"
+	"time"
 
 	"github.com/redis/go-redis/v9"
-	"golang.org/x/oauth2"
 
 	"github.com/siddhant-vij/PokeChat-Universe/database"
 )
@@ -32,5 +32,8 @@ type AppConfig struct {
 	CallbackURL      string
 	SessionState     string
 	PkceCodeVerifier string
-	SessionTokenMap  map[string]*oauth2.Token
+
+	IpAddress           string
+	UserAgent           string
+	AccessTokenIssuedAt time.Time
 }

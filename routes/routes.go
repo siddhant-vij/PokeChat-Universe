@@ -29,7 +29,6 @@ func init() {
 	config.LoadEnv(appConfig)
 
 	appConfig.Mutex = &sync.RWMutex{}
-	appConfig.SessionTokenMap = make(map[string]*oauth2.Token)
 	appConfig.PkceCodeVerifier = oauth2.GenerateVerifier()
 
 	dbService = config.NewDatabaseService(appConfig)
@@ -133,5 +132,5 @@ func AuthHandlers(mux *http.ServeMux) {
 			<p>Resource Page | <a href="/logout">Logout</a></p>
 		</body>
 		</html>`))
-	}), authService, appConfig))
+	}), appConfig))
 }
