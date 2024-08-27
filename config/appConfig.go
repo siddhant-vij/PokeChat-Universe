@@ -1,6 +1,8 @@
 package config
 
 import (
+	"sync"
+
 	"github.com/redis/go-redis/v9"
 
 	"github.com/siddhant-vij/PokeChat-Universe/database"
@@ -20,4 +22,6 @@ type AppConfig struct {
 
 	DBQueries   *database.Queries
 	RedisClient *redis.Client
+
+	Mutex *sync.RWMutex
 }

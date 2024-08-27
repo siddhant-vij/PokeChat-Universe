@@ -1,0 +1,9 @@
+#!/bin/bash
+
+source .env
+
+# psql -U $DB_USERNAME
+# DROP DATABASE $DB_DATABASE;
+# CREATE DATABASE $DB_DATABASE;
+
+psql -U $DB_USERNAME $DB_DATABASE < pgDump_$DB_DATABASE.sql

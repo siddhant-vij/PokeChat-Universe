@@ -70,6 +70,17 @@ func (q *Queries) GetPokemonByID(ctx context.Context, id int32) (Pokemon, error)
 	return i, err
 }
 
+const getPokemonCount = `-- name: GetPokemonCount :one
+SELECT COUNT(*) FROM pokemons
+`
+
+func (q *Queries) GetPokemonCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getPokemonCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getPokemonDetailsByName = `-- name: GetPokemonDetailsByName :one
 SELECT id, created_at, updated_at, name, height, weight, picture_url, base_experience, types, hp, attack, defense, special_attack, special_defense, speed FROM pokemons
 WHERE name = $1 LIMIT 1

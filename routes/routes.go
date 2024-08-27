@@ -2,8 +2,12 @@ package routes
 
 import (
 	"net/http"
+	"sync"
+
+	"github.com/jasonlvhit/gocron"
 
 	"github.com/siddhant-vij/PokeChat-Universe/config"
+	"github.com/siddhant-vij/PokeChat-Universe/config/client"
 	"github.com/siddhant-vij/PokeChat-Universe/database"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/crud"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/health"
@@ -19,14 +23,26 @@ func init() {
 	appConfig = &config.AppConfig{}
 	config.LoadEnv(appConfig)
 
+	appConfig.Mutex = &sync.RWMutex{}
+
 	dbService = config.NewDatabaseService(appConfig)
 	appConfig.DBQueries = database.New(dbService.DatabaseClient)
 
 	redisService = config.NewRedisService(appConfig)
 	appConfig.RedisClient = redisService.RedisClient
+
+	client.FetchAndInsertRequest(appConfig)
+}
+
+func updateDatabaseCronJob() {
+	gocron.Every(30).Days().Do(client.FetchAndInsertRequest, appConfig)
+	<-gocron.Start()
 }
 
 func RegisterRoutes(mux *http.ServeMux) {
+	// Cron job to update database
+	go updateDatabaseCronJob()
+
 	// Handlers for services setup, connections & CRUD operations
 	HealthHandlers(mux)
 	CrudHandlers(mux)

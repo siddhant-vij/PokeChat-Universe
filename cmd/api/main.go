@@ -13,5 +13,6 @@ func main() {
 	corsMux := middlewares.CorsMiddleware(mux)
 	routes.RegisterRoutes(mux)
 
+	log.Print("Server listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", corsMux))
 }
