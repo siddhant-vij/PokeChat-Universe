@@ -47,3 +47,11 @@ type User struct {
 	Email      string
 	PictureUrl string
 }
+
+type UserPokemon struct {
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	UserID    uuid.UUID
+	PokemonID int32
+}

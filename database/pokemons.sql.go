@@ -21,6 +21,27 @@ func (q *Queries) DeletePokemonByID(ctx context.Context, id int32) error {
 	return err
 }
 
+const getOnePokemonAfterCollection = `-- name: GetOnePokemonAfterCollection :one
+SELECT id, name, picture_url
+FROM pokemons
+WHERE id > $1
+ORDER BY id ASC
+LIMIT 1
+`
+
+type GetOnePokemonAfterCollectionRow struct {
+	ID         int32
+	Name       string
+	PictureUrl string
+}
+
+func (q *Queries) GetOnePokemonAfterCollection(ctx context.Context, id int32) (GetOnePokemonAfterCollectionRow, error) {
+	row := q.db.QueryRowContext(ctx, getOnePokemonAfterCollection, id)
+	var i GetOnePokemonAfterCollectionRow
+	err := row.Scan(&i.ID, &i.Name, &i.PictureUrl)
+	return i, err
+}
+
 const getPokemonByID = `-- name: GetPokemonByID :one
 SELECT id, created_at, updated_at, name, height, weight, picture_url, base_experience, types, hp, attack, defense, special_attack, special_defense, speed FROM pokemons
 WHERE id = $1 LIMIT 1
@@ -49,13 +70,13 @@ func (q *Queries) GetPokemonByID(ctx context.Context, id int32) (Pokemon, error)
 	return i, err
 }
 
-const getPokemonByName = `-- name: GetPokemonByName :one
+const getPokemonDetailsByName = `-- name: GetPokemonDetailsByName :one
 SELECT id, created_at, updated_at, name, height, weight, picture_url, base_experience, types, hp, attack, defense, special_attack, special_defense, speed FROM pokemons
 WHERE name = $1 LIMIT 1
 `
 
-func (q *Queries) GetPokemonByName(ctx context.Context, name string) (Pokemon, error) {
-	row := q.db.QueryRowContext(ctx, getPokemonByName, name)
+func (q *Queries) GetPokemonDetailsByName(ctx context.Context, name string) (Pokemon, error) {
+	row := q.db.QueryRowContext(ctx, getPokemonDetailsByName, name)
 	var i Pokemon
 	err := row.Scan(
 		&i.ID,

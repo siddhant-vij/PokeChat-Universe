@@ -4,9 +4,16 @@ INSERT INTO pokemons
 VALUES
   ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);
 
--- name: GetPokemonByName :one
+-- name: GetPokemonDetailsByName :one
 SELECT * FROM pokemons
 WHERE name = $1 LIMIT 1;
+
+-- name: GetOnePokemonAfterCollection :one
+SELECT id, name, picture_url
+FROM pokemons
+WHERE id > $1
+ORDER BY id ASC
+LIMIT 1;
 
 -- name: GetPokemonByID :one
 SELECT * FROM pokemons
