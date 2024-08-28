@@ -1,9 +1,3 @@
-# Include environment variables
-include $(PWD)/.env
-
-# Update PATH to include Go binaries
-PATH := $(USER_HOME)/go/bin:$(PATH)
-
 # Default target is to build the application
 all: build
 
@@ -12,6 +6,8 @@ build:
 	@echo "Building the application..."
 	@go mod tidy
 	@scripts/sqlc.sh
+	@templ generate
+	@tailwindcss -i cmd/web/public/css/input.css -o cmd/web/public/css/output.css --minify
 	@go build -o main cmd/api/main.go
 
 # Run the application (including setup and migrations)
