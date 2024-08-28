@@ -22,9 +22,7 @@ type pokemonCount struct {
 var pokemonIdsToFetch []int
 
 func getPokemonCountFromDB(cfg *config.AppConfig) int {
-	cfg.Mutex.RLock()
 	count, err := cfg.DBQueries.GetPokemonCount(context.Background())
-	cfg.Mutex.RUnlock()
 	if err != nil {
 		log.Fatalf("error getting pokemon count from DB. Err: %v", err)
 	}

@@ -136,9 +136,7 @@ func insertPokemonDataIntoDB(cfg *config.AppConfig, pokemonData pokemonFromAPI) 
 		Speed:          int32(pokemonData.Stats[5].BaseStat),
 	}
 
-	cfg.Mutex.Lock()
 	err := cfg.DBQueries.InsertPokemon(context.Background(), insertPokemonParams)
-	cfg.Mutex.Unlock()
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 			pokemonToBeUpdated, ok := isPokemonUpdatable(insertPokemonParams, cfg)
@@ -201,9 +199,7 @@ func isPokemonUpdatable(insertPokemonParams database.InsertPokemonParams, cfg *c
 }
 
 func getPokemonDataById(id int32, cfg *config.AppConfig) (database.Pokemon, error) {
-	cfg.Mutex.RLock()
 	pokemon, err := cfg.DBQueries.GetPokemonByID(context.Background(), id)
-	cfg.Mutex.RUnlock()
 	if err != nil {
 		return database.Pokemon{}, err
 	}
@@ -226,9 +222,7 @@ func updatePokemonById(pokemon updatePokemonDB, cfg *config.AppConfig) error {
 		SpecialDefense: pokemon.insertParam.SpecialDefense,
 		Speed:          pokemon.insertParam.Speed,
 	}
-	cfg.Mutex.Lock()
 	err := cfg.DBQueries.UpdatePokemonByID(context.Background(), updateParams)
-	cfg.Mutex.Unlock()
 	if err != nil {
 		return err
 	}
@@ -256,9 +250,7 @@ func insertEvolutionChainDataIntoDB(cfg *config.AppConfig, evolutionChainData ev
 			}
 		}
 
-		cfg.Mutex.Lock()
 		err := cfg.DBQueries.InsertPokemonEvolution(context.Background(), insertPokemonEvolutionParams)
-		cfg.Mutex.Unlock()
 		if err != nil {
 			return err
 		}

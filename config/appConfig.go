@@ -1,7 +1,6 @@
 package config
 
 import (
-	"sync"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -23,8 +22,6 @@ type AppConfig struct {
 
 	DBQueries   *database.Queries
 	RedisClient *redis.Client
-
-	Mutex *sync.RWMutex
 
 	AuthDomain       string
 	ClientID         string

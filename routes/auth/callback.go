@@ -35,9 +35,7 @@ func ServeCallbackPage(w http.ResponseWriter, r *http.Request, authenticator *au
 		return
 	}
 
-	cfg.Mutex.Lock()
 	err = cfg.DBQueries.InsertUser(context.Background(), userDataFromToken)
-	cfg.Mutex.Unlock()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

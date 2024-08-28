@@ -2,7 +2,6 @@ package routes
 
 import (
 	"net/http"
-	"sync"
 
 	"github.com/jasonlvhit/gocron"
 	"golang.org/x/oauth2"
@@ -28,7 +27,6 @@ func init() {
 	appConfig = &config.AppConfig{}
 	config.LoadEnv(appConfig)
 
-	appConfig.Mutex = &sync.RWMutex{}
 	appConfig.PkceCodeVerifier = oauth2.GenerateVerifier()
 
 	dbService = config.NewDatabaseService(appConfig)
