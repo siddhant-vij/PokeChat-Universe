@@ -68,18 +68,22 @@ func do(baseurl, endpoint, accessToken string, data *UserInfoData) error {
 		nil,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create auth's userinfo request. Err: %w", err)
 	}
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get user info from auth. Err: %w", err)
 	}
 	defer resp.Body.Close()
 
-	return json.NewDecoder(resp.Body).Decode(data)
+	err = json.NewDecoder(resp.Body).Decode(data)
+	if err != nil {
+		return fmt.Errorf("failed to decode user info from auth. Err: %w", err)
+	}
+	return nil
 }
 
 func extractName(userInfo *UserInfoData) string {

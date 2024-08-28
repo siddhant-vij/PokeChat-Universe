@@ -3,6 +3,7 @@ package authroutes
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"log"
 	"net/http"
 
 	"golang.org/x/oauth2"
@@ -23,7 +24,8 @@ func generateRandomState() (string, error) {
 func ServeLoginPage(w http.ResponseWriter, r *http.Request, auth *auth.Authenticator, cfg *config.AppConfig) {
 	state, err := generateRandomState()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("error generating state during login: %v", err)
+		// Server error page: StatusInternalServerError (500)
 		return
 	}
 	cfg.SessionState = state

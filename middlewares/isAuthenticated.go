@@ -2,7 +2,8 @@ package middlewares
 
 import (
 	"context"
-	"errors"
+	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -14,18 +15,21 @@ func IsAuthenticated(next http.Handler, cfg *config.AppConfig) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sessionIdCookie, err := r.Cookie("session_id")
 		if err != nil {
+			log.Printf("error getting the session_id cookie. Err: %v", err)
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 
 		err = VerifySessionBinding(r.Context(), sessionIdCookie.Value, cfg)
 		if err != nil {
+			log.Println(err)
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 
 		sessionId, err := RegenerateUserSessionIfNeeded(r.Context(), sessionIdCookie.Value, cfg)
 		if err != nil {
+			log.Println(err)
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
@@ -45,33 +49,40 @@ func IsAuthenticated(next http.Handler, cfg *config.AppConfig) http.Handler {
 func VerifySessionBinding(ctx context.Context, sessionId string, cfg *config.AppConfig) error {
 	storedIpAddress, err := cfg.RedisClient.HGet(ctx, "session:"+sessionId, "ip_address").Result()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get stored ip_address for session %s from redis: %w", sessionId, err)
 	}
 
 	storedUserAgent, err := cfg.RedisClient.HGet(ctx, "session:"+sessionId, "user_agent").Result()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get stored user_agent for session %s from redis: %w", sessionId, err)
 	}
 
 	if storedIpAddress != cfg.IpAddress || storedUserAgent != cfg.UserAgent {
-		return errors.New("suspicious activity detected")
+		return fmt.Errorf("suspicious session activity. session %s is no longer valid", sessionId)
 	}
 	return nil
 }
 
 func RegenerateUserSessionIfNeeded(ctx context.Context, sessionId string, cfg *config.AppConfig) (string, error) {
 	if time.Since(cfg.AccessTokenIssuedAt) >= 24*time.Hour {
-		return sessionId, errors.New("access token expired")
+		return sessionId, fmt.Errorf("access token for session %s has expired", sessionId)
 	}
 
 	sessionData, err := cfg.RedisClient.HGetAll(ctx, "session:"+sessionId).Result()
 	if err != nil {
-		return sessionId, err
+		return sessionId, fmt.Errorf("failed to get session data for session %s from redis: %w", sessionId, err)
 	}
 
-	lastActivity, _ := time.Parse(time.RFC3339, sessionData["last_activity"])
+	lastActivity, err := time.Parse(time.RFC3339, sessionData["last_activity"])
+	if err != nil {
+		return sessionId, fmt.Errorf("failed to parse last_activity for session %s: %w", sessionId, err)
+	}
+
 	if time.Since(lastActivity) > 30*time.Minute {
-		newSessionId, _ := auth.GenerateSessionId()
+		newSessionId, err := auth.GenerateSessionId()
+		if err != nil {
+			return sessionId, fmt.Errorf("failed to create new session id while regenerating user session: %w", err)
+		}
 
 		pipe := cfg.RedisClient.TxPipeline()
 
@@ -84,7 +95,7 @@ func RegenerateUserSessionIfNeeded(ctx context.Context, sessionId string, cfg *c
 		pipe.Del(ctx, "session:"+sessionId)
 
 		if _, err := pipe.Exec(ctx); err != nil {
-			return sessionId, err
+			return sessionId, fmt.Errorf("failed to execute redis transaction pipeline: %w", err)
 		}
 		return newSessionId, nil
 	}

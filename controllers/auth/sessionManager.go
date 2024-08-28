@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"time"
 
 	"github.com/siddhant-vij/PokeChat-Universe/config"
@@ -18,8 +19,11 @@ type UserSession struct {
 	ExpiresAt    time.Time
 }
 
-func NewUserSession(cfg *config.AppConfig, accessToken string) *UserSession {
-	sessionId, _ := GenerateSessionId()
+func NewUserSession(cfg *config.AppConfig, accessToken string) (*UserSession, error) {
+	sessionId, err := GenerateSessionId()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create new session id while creating a new user session: %w", err)
+	}
 	return &UserSession{
 		SessionId:    sessionId,
 		AccessToken:  accessToken,
@@ -27,7 +31,7 @@ func NewUserSession(cfg *config.AppConfig, accessToken string) *UserSession {
 		UserAgent:    cfg.UserAgent,
 		LastActivity: time.Now(),
 		ExpiresAt:    time.Now().Add(24 * time.Hour),
-	}
+	}, nil
 }
 
 func (s *UserSession) StoreSession(ctx context.Context, cfg *config.AppConfig) error {
@@ -40,7 +44,7 @@ func (s *UserSession) StoreSession(ctx context.Context, cfg *config.AppConfig) e
 	}
 	err := cfg.RedisClient.HSet(ctx, "session:"+s.SessionId, sessionData).Err()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to store user session with id: %s in redis. Err: %w", s.SessionId, err)
 	}
 
 	cfg.RedisClient.Expire(ctx, "session:"+s.SessionId, time.Until(s.ExpiresAt))

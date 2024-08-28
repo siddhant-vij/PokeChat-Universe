@@ -2,6 +2,7 @@ package authroutes
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -12,7 +13,8 @@ import (
 func HandleLogout(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	logoutUrl, err := url.Parse("https://" + cfg.AuthDomain + "/v2/logout")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("error parsing logout url: %v", err)
+		// Server error page: StatusInternalServerError (500)
 		return
 	}
 
@@ -23,7 +25,8 @@ func HandleLogout(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig)
 
 	returnTo, err := url.Parse(scheme + "://" + r.Host)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("error parsing returnTo url: %v", err)
+		// Server error page: StatusInternalServerError (500)
 		return
 	}
 

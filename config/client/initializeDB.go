@@ -73,9 +73,9 @@ func FetchAndInsertRequest(cfg *config.AppConfig) {
 		}
 
 		wg.Wait()
-		log.Println("Database Initialized!")
+		log.Println("Success: Database Initialized!")
 	} else {
-		log.Println("Database initialized. No new pokemon to fetch!")
+		log.Println("Success: Database initialized. No new pokemon to fetch!")
 	}
 	pokemonIdsToFetch = []int{}
 }
@@ -85,7 +85,7 @@ func fetchDataAndInsertIntoDB(cfg *config.AppConfig, pokemonID int) error {
 	var pokemonData pokemonFromAPI
 	err := do(fmt.Sprintf("/pokemon/%d", pokemonID), &pokemonData)
 	if err != nil {
-		return err
+		return fmt.Errorf("error fetching pokemon with id: %d. Err: %w", pokemonID, err)
 	}
 	err = insertPokemonDataIntoDB(cfg, pokemonData)
 	if err != nil {
@@ -97,7 +97,7 @@ func fetchDataAndInsertIntoDB(cfg *config.AppConfig, pokemonID int) error {
 	var speciesData speciesDataFromAPI
 	err = do(fmt.Sprintf("/pokemon-species/%d", speciesId), &speciesData)
 	if err != nil {
-		return err
+		return fmt.Errorf("error fetching species with id: %d. Err: %w", speciesId, err)
 	}
 	chainId := getIdFromUrl(speciesData.EvolutionChain.Url)
 
@@ -105,7 +105,7 @@ func fetchDataAndInsertIntoDB(cfg *config.AppConfig, pokemonID int) error {
 	var evolutionChainData evolutionChainFromAPI
 	err = do(fmt.Sprintf("/evolution-chain/%d", chainId), &evolutionChainData)
 	if err != nil {
-		return err
+		return fmt.Errorf("error fetching evolution chain with id: %d. Err: %w", chainId, err)
 	}
 	err = insertEvolutionChainDataIntoDB(cfg, evolutionChainData, chainId)
 	if err != nil {
@@ -141,12 +141,15 @@ func insertPokemonDataIntoDB(cfg *config.AppConfig, pokemonData pokemonFromAPI) 
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 			pokemonToBeUpdated, ok := isPokemonUpdatable(insertPokemonParams, cfg)
 			if ok {
-				updatePokemonById(pokemonToBeUpdated, cfg)
+				err = updatePokemonById(pokemonToBeUpdated, cfg)
+				if err != nil {
+					return err
+				}
 			} else {
-				// Ignore if pokemon is not updatable. It exists in DB with same info coming from API.
+				// Ignore if pokemon is not updatable. It exists in DB with same info coming from API. Nothing to log here.
 			}
 		} else {
-			return err
+			return fmt.Errorf("error inserting pokemon with id: %d into DB. Err: %w", insertPokemonParams.ID, err)
 		}
 	}
 	return nil
@@ -163,6 +166,7 @@ func isPokemonUpdatable(insertPokemonParams database.InsertPokemonParams, cfg *c
 
 	pokemonFromDB, err := getPokemonDataById(insertPokemonParams.ID, cfg)
 	if err != nil {
+		log.Println(err)
 		updateParams = updatePokemonDB{
 			CreatedAt: time.Now(),
 		}
@@ -201,7 +205,7 @@ func isPokemonUpdatable(insertPokemonParams database.InsertPokemonParams, cfg *c
 func getPokemonDataById(id int32, cfg *config.AppConfig) (database.Pokemon, error) {
 	pokemon, err := cfg.DBQueries.GetPokemonByID(context.Background(), id)
 	if err != nil {
-		return database.Pokemon{}, err
+		return database.Pokemon{}, fmt.Errorf("error getting pokemon with id: %d from DB while checking if it's updatable. Err: %w", id, err)
 	}
 	return pokemon, nil
 }
@@ -224,7 +228,7 @@ func updatePokemonById(pokemon updatePokemonDB, cfg *config.AppConfig) error {
 	}
 	err := cfg.DBQueries.UpdatePokemonByID(context.Background(), updateParams)
 	if err != nil {
-		return err
+		return fmt.Errorf("error updating pokemon with id: %d in DB after checking if it's updatable. Err: %w", updateParams.ID, err)
 	}
 	return nil
 }
@@ -252,7 +256,7 @@ func insertEvolutionChainDataIntoDB(cfg *config.AppConfig, evolutionChainData ev
 
 		err := cfg.DBQueries.InsertPokemonEvolution(context.Background(), insertPokemonEvolutionParams)
 		if err != nil {
-			return err
+			return fmt.Errorf("error inserting pokemon evolution with id: %d in DB. Err: %w", insertPokemonEvolutionParams.PokemonID, err)
 		}
 	}
 	return nil
