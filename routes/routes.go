@@ -3,9 +3,11 @@ package routes
 import (
 	"net/http"
 
+	"github.com/a-h/templ"
 	"github.com/jasonlvhit/gocron"
 	"golang.org/x/oauth2"
 
+	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/test"
 	"github.com/siddhant-vij/PokeChat-Universe/config"
 	"github.com/siddhant-vij/PokeChat-Universe/config/client"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/auth"
@@ -14,6 +16,7 @@ import (
 	authroutes "github.com/siddhant-vij/PokeChat-Universe/routes/auth"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/crud"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/health"
+	"github.com/siddhant-vij/PokeChat-Universe/routes/test/ui"
 )
 
 var (
@@ -49,12 +52,19 @@ func RegisterRoutes(mux *http.ServeMux) {
 	// Cron job to update database
 	go updateDatabaseCronJob()
 
+	// File Server setup
+	fileServer := http.FileServer(http.Dir("cmd/web/public"))
+	mux.Handle("/cmd/web/public/", http.StripPrefix("/cmd/web/public/", fileServer))
+
 	// Handlers for services setup, connections & CRUD operations
 	HealthHandlers(mux)
 	CrudHandlers(mux)
 
 	// Handlers for authentication
 	AuthHandlers(mux)
+
+	// UI Handlers for Templ & Tailwind setup
+	UiTestHandlers(mux)
 }
 
 func HealthHandlers(mux *http.ServeMux) {
@@ -131,4 +141,9 @@ func AuthHandlers(mux *http.ServeMux) {
 		</body>
 		</html>`))
 	}), appConfig))
+}
+
+func UiTestHandlers(mux *http.ServeMux) {
+	mux.Handle("/web", templ.Handler(test.Base()))
+	mux.HandleFunc("/hello", ui.HelloWebHandler)
 }

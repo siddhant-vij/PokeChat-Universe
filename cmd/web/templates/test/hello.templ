@@ -1,0 +1,30 @@
+package test
+
+templ HelloForm() {
+	<form class="form-control w-full max-w-xs justify-center">
+		<div class="label">
+			<span class="label-text">What is your name?</span>
+		</div>
+		<input type="text" placeholder="Type here" class="input input-bordered w-full max-w-xs" id="name" name="name"/>
+		<br/>
+		<button
+			class="btn btn-primary"
+			hx-post="/hello"
+			hx-trigger="click"
+			hx-target="#hello-container"
+			hx-swap="beforeend"
+		>
+			Submit
+		</button>
+	</form>
+	<div class="divider"></div>
+	<ul id="hello-container"></ul>
+}
+
+templ HelloPost(name string) {
+	<li class="list-none">Hello, { name }</li>
+}
+
+templ HelloPostOOB() {
+	<input type="text" placeholder="Type here" class="input input-bordered w-full max-w-xs" id="name" name="name" hx-swap-oob="true"/>
+}
