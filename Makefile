@@ -9,8 +9,6 @@ all: build
 
 # Build the application
 build:
-	@echo "Building the database..."
-	@scripts/restoreDump.sh
 	@echo "Building the application..."
 	@go mod tidy
 	@scripts/sqlc.sh
