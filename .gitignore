@@ -29,3 +29,8 @@ tmp/
 main
 *_templ.go
 pgDump_*.sql
+output.css
+
+# Externally linked - for VSCode autocomplete when using this cli: https://github.com/dobicinaitis/tailwind-cli-extra
+# Supports DaisyUI components in TailwindCSS
+node_modules
