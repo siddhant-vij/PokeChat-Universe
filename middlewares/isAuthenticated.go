@@ -39,7 +39,6 @@ func IsAuthenticated(next http.Handler, cfg *config.AppConfig) http.Handler {
 			Secure:   false,
 			HttpOnly: true,
 			MaxAge:   int(time.Until(cfg.AccessTokenIssuedAt.Add(24 * time.Hour)).Seconds()),
-			SameSite: http.SameSiteStrictMode,
 		})
 
 		next.ServeHTTP(w, r)

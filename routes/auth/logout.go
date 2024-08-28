@@ -47,7 +47,6 @@ func HandleLogout(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig)
 		Expires:  time.Unix(0, 0),
 		HttpOnly: true,
 		Secure:   false,
-		SameSite: http.SameSiteStrictMode,
 	})
 
 	http.Redirect(w, r, logoutUrl.String(), http.StatusSeeOther)

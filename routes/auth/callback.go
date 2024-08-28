@@ -67,7 +67,6 @@ func ServeCallbackPage(w http.ResponseWriter, r *http.Request, authenticator *au
 		MaxAge:   86400,
 		Secure:   false,
 		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
 	})
 	http.Redirect(w, r, "/resource", http.StatusTemporaryRedirect)
 }
