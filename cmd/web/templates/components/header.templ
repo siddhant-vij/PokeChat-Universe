@@ -4,14 +4,65 @@ templ Header(isErrorPage, authStatus bool) {
 	<header class="px-8 z-10 sticky top-0 bg-base-100">
 		<div class="navbar">
 			<div class="navbar-start">
-				<a href="/" class="btn btn-ghost text-xl">PokeChat</a>
+				<a href="/resource" class="btn btn-ghost text-xl">PokeChat</a>
 			</div>
 			if !isErrorPage {
 				<div class="navbar-center">
 					<ul class="menu menu-horizontal">
-						<li><a id="available-tab" class="active">Available</a></li>
-						<li><a id="collected-tab">Collected</a></li>
-						<li><a id="chat-tab">Chat</a></li>
+						if authStatus {
+							<li>
+								<a
+									id="available-tab"
+									class="active"
+									hx-get="/available"
+									hx-trigger="click"
+									hx-target="#page-details"
+									hx-swap="outerHTML"
+								>
+									Available
+								</a>
+							</li>
+							<li>
+								<a
+									id="collected-tab"
+									hx-get="/collected"
+									hx-trigger="click"
+									hx-target="#page-details"
+									hx-swap="outerHTML"
+								>
+									Collected
+								</a>
+							</li>
+							<li>
+								<a
+									id="chat-tab"
+									hx-get="/chat"
+									hx-trigger="click"
+									hx-target="#page-details"
+									hx-swap="outerHTML"
+								>
+									Chat
+								</a>
+							</li>
+						} else {
+							<li><a id="available-tab" class="active">Available</a></li>
+							<li>
+								<a
+									id="collected-tab"
+									class="tooltip tooltip-bottom cursor-not-allowed"
+									data-tip="Login to explore further"
+									data-disabled="true"
+								>Collected</a>
+							</li>
+							<li>
+								<a
+									id="chat-tab"
+									class="tooltip tooltip-bottom cursor-not-allowed"
+									data-tip="Login to explore further"
+									data-disabled="true"
+								>Chat</a>
+							</li>
+						}
 					</ul>
 				</div>
 			}

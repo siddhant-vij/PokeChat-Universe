@@ -7,6 +7,7 @@ import (
 	"github.com/jasonlvhit/gocron"
 	"golang.org/x/oauth2"
 
+	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
 	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/test"
 	"github.com/siddhant-vij/PokeChat-Universe/config"
 	"github.com/siddhant-vij/PokeChat-Universe/config/client"
@@ -61,11 +62,17 @@ func RegisterRoutes(mux *http.ServeMux) {
 	HealthHandlers(mux)
 	CrudHandlers(mux)
 
+	// UI Handlers for Templ & Tailwind setup
+	UiTestHandlers(mux)
+
 	// Handlers for authentication
 	AuthHandlers(mux)
 
-	// UI Handlers for Templ & Tailwind setup
-	UiTestHandlers(mux)
+	// Handlers for Home & Resource Pages
+	PageHandlers(mux)
+
+	// Handlers for App Workflow
+	AppWorkflowHandlers(mux)
 }
 
 func HealthHandlers(mux *http.ServeMux) {
@@ -114,15 +121,12 @@ func CrudHandlers(mux *http.ServeMux) {
 	})
 }
 
-func AuthHandlers(mux *http.ServeMux) {
-	mux.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`<html>
-		<body>
-			<p>Home Page | <a href="/login">Login</a></p>			
-		</body>
-		</html>`))
-	}))
+func UiTestHandlers(mux *http.ServeMux) {
+	mux.Handle("/web", templ.Handler(test.Base()))
+	mux.HandleFunc("/hello", ui.HelloWebHandler)
+}
 
+func AuthHandlers(mux *http.ServeMux) {
 	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		authroutes.ServeLoginPage(w, r, authService, appConfig)
 	})
@@ -134,17 +138,33 @@ func AuthHandlers(mux *http.ServeMux) {
 	mux.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
 		authroutes.HandleLogout(w, r, appConfig)
 	})
+}
+
+func PageHandlers(mux *http.ServeMux) {
+	mux.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		homePage := pages.HomePage()
+		homePage.Render(r.Context(), w)
+	}))
 
 	mux.Handle("/resource", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`<html>
-		<body>
-			<p>Resource Page | <a href="/logout">Logout</a></p>
-		</body>
-		</html>`))
+		resourcePage := pages.ResourcePage()
+		resourcePage.Render(r.Context(), w)
 	}), appConfig))
 }
 
-func UiTestHandlers(mux *http.ServeMux) {
-	mux.Handle("/web", templ.Handler(test.Base()))
-	mux.HandleFunc("/hello", ui.HelloWebHandler)
+func AppWorkflowHandlers(mux *http.ServeMux) {
+	mux.HandleFunc("/available", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		availableTab := pages.AvailableTest()
+		availableTab.Render(r.Context(), w)
+	}))
+
+	mux.HandleFunc("/collected", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		collectedTab := pages.CollectedTest()
+		collectedTab.Render(r.Context(), w)
+	}))
+
+	mux.HandleFunc("/chat", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		chatTab := pages.ChatTest()
+		chatTab.Render(r.Context(), w)
+	}))
 }
