@@ -76,5 +76,5 @@ func ServeCallbackPage(w http.ResponseWriter, r *http.Request, authenticator *au
 		HttpOnly: true,
 	})
 	cfg.AuthStatus = true
-	http.Redirect(w, r, "/resource", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/pokedex", http.StatusTemporaryRedirect)
 }

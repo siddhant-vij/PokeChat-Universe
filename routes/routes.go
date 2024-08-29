@@ -7,7 +7,6 @@ import (
 	"github.com/jasonlvhit/gocron"
 	"golang.org/x/oauth2"
 
-	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
 	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/test"
 	"github.com/siddhant-vij/PokeChat-Universe/config"
 	"github.com/siddhant-vij/PokeChat-Universe/config/client"
@@ -15,6 +14,7 @@ import (
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
 	"github.com/siddhant-vij/PokeChat-Universe/middlewares"
 	authroutes "github.com/siddhant-vij/PokeChat-Universe/routes/auth"
+	pokedexroutes "github.com/siddhant-vij/PokeChat-Universe/routes/pokedex"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/crud"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/health"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/ui"
@@ -71,8 +71,8 @@ func RegisterRoutes(mux *http.ServeMux) {
 	// Handlers for Home & Resource Pages
 	PageHandlers(mux)
 
-	// Handlers for App Workflow
-	AppWorkflowHandlers(mux)
+	// Handlers for App Workflow - Pokedex
+	PokedexHandlers(mux)
 }
 
 func HealthHandlers(mux *http.ServeMux) {
@@ -141,30 +141,15 @@ func AuthHandlers(mux *http.ServeMux) {
 }
 
 func PageHandlers(mux *http.ServeMux) {
-	mux.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		homePage := pages.HomePage()
-		homePage.Render(r.Context(), w)
-	}))
+	mux.HandleFunc("/", http.HandlerFunc(pokedexroutes.ServeHomePage))
 
-	mux.Handle("/resource", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resourcePage := pages.ResourcePage()
-		resourcePage.Render(r.Context(), w)
-	}), appConfig))
+	mux.Handle("/pokedex", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ServePokedexPage), appConfig))
 }
 
-func AppWorkflowHandlers(mux *http.ServeMux) {
-	mux.HandleFunc("/available", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		availableTab := pages.AvailableTest()
-		availableTab.Render(r.Context(), w)
-	}))
+func PokedexHandlers(mux *http.ServeMux) {
+	mux.Handle("/available", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.AvailablePokedexHandler), appConfig))
 
-	mux.HandleFunc("/collected", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		collectedTab := pages.CollectedTest()
-		collectedTab.Render(r.Context(), w)
-	}))
+	mux.Handle("/collected", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.CollectedPokedexHandler), appConfig))
 
-	mux.HandleFunc("/chat", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		chatTab := pages.ChatTest()
-		chatTab.Render(r.Context(), w)
-	}))
+	mux.Handle("/chat", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatPokedexHandler), appConfig))
 }
