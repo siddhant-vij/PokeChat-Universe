@@ -33,4 +33,5 @@ type AppConfig struct {
 	IpAddress           string
 	UserAgent           string
 	AccessTokenIssuedAt time.Time
+	AuthStatus          bool
 }

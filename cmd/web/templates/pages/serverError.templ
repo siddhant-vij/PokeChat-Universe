@@ -1,0 +1,39 @@
+package pages
+
+import "github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
+
+templ ServerErrorPage(authStatus bool) {
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link href="/cmd/web/public/css/output.css" rel="stylesheet"/>
+			<script src="/cmd/web/public/js/htmx.min.js" defer></script>
+			<title>PokeChat Universe</title>
+		</head>
+		<body class="bg-zinc-600 scroll-smooth">
+			<div class="flex flex-col w-[1024px] mx-auto h-screen">
+				@components.Header(true, authStatus)
+				@ServerError()
+				<hr/>
+				@components.Footer()
+			</div>
+		</body>
+	</html>
+}
+
+templ ServerError() {
+	<main class="flex-grow">
+		<div class="p-8 bg-base-100 h-full flex justify-center">
+			<div class="text-center">
+				<div class="pt-48">
+					<h1 class="text-3xl font-bold">Something went wrong :(</h1>
+					<p class="py-6">
+						We are currently working on it. Please <a href="/" class="link link-primary">go back</a> and try again later.
+					</p>
+				</div>
+			</div>
+		</div>
+	</main>
+}

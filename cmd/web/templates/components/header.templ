@@ -1,0 +1,27 @@
+package components
+
+templ Header(isErrorPage, authStatus bool) {
+	<header class="px-8 z-10 sticky top-0 bg-base-100">
+		<div class="navbar">
+			<div class="navbar-start">
+				<a href="/" class="btn btn-ghost text-xl">PokeChat</a>
+			</div>
+			if !isErrorPage {
+				<div class="navbar-center">
+					<ul class="menu menu-horizontal">
+						<li><a id="available-tab" class="active">Available</a></li>
+						<li><a id="collected-tab">Collected</a></li>
+						<li><a id="chat-tab">Chat</a></li>
+					</ul>
+				</div>
+			}
+			<div class="navbar-end">
+				if authStatus {
+					<a href="/logout" class="btn btn-primary">Logout</a>
+				} else {
+					<a href="/login" class="btn btn-primary">Login</a>
+				}
+			</div>
+		</div>
+	</header>
+}

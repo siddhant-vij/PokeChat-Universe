@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
 	"github.com/siddhant-vij/PokeChat-Universe/config"
 )
 
@@ -14,7 +15,8 @@ func HandleLogout(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig)
 	logoutUrl, err := url.Parse("https://" + cfg.AuthDomain + "/v2/logout")
 	if err != nil {
 		log.Printf("error parsing logout url: %v", err)
-		// Server error page: StatusInternalServerError (500)
+		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+		serverErrorPage.Render(r.Context(), w)
 		return
 	}
 
@@ -26,7 +28,8 @@ func HandleLogout(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig)
 	returnTo, err := url.Parse(scheme + "://" + r.Host)
 	if err != nil {
 		log.Printf("error parsing returnTo url: %v", err)
-		// Server error page: StatusInternalServerError (500)
+		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+		serverErrorPage.Render(r.Context(), w)
 		return
 	}
 
@@ -48,6 +51,6 @@ func HandleLogout(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig)
 		HttpOnly: true,
 		Secure:   false,
 	})
-
+	cfg.AuthStatus = false
 	http.Redirect(w, r, logoutUrl.String(), http.StatusSeeOther)
 }

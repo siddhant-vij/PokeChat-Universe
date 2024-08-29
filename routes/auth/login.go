@@ -8,6 +8,7 @@ import (
 
 	"golang.org/x/oauth2"
 
+	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
 	"github.com/siddhant-vij/PokeChat-Universe/config"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/auth"
 )
@@ -25,7 +26,8 @@ func ServeLoginPage(w http.ResponseWriter, r *http.Request, auth *auth.Authentic
 	state, err := generateRandomState()
 	if err != nil {
 		log.Printf("error generating state during login: %v", err)
-		// Server error page: StatusInternalServerError (500)
+		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+		serverErrorPage.Render(r.Context(), w)
 		return
 	}
 	cfg.SessionState = state

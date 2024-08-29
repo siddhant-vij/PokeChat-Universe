@@ -8,6 +8,7 @@ import (
 
 	"golang.org/x/oauth2"
 
+	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
 	"github.com/siddhant-vij/PokeChat-Universe/config"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/auth"
 )
@@ -15,7 +16,8 @@ import (
 func ServeCallbackPage(w http.ResponseWriter, r *http.Request, authenticator *auth.Authenticator, cfg *config.AppConfig) {
 	if r.URL.Query().Get("state") != cfg.SessionState {
 		log.Printf("invalid state parameter. Expected: %s, got: %s", cfg.SessionState, r.URL.Query().Get("state"))
-		// Client error page: StatusBadRequest (400)
+		clientErrorPage := pages.ClientErrorPage(cfg.AuthStatus)
+		clientErrorPage.Render(r.Context(), w)
 		return
 	}
 
@@ -26,7 +28,8 @@ func ServeCallbackPage(w http.ResponseWriter, r *http.Request, authenticator *au
 	)
 	if err != nil {
 		log.Printf("failed to convert an authorization code into a token. Err: %v", err)
-		// Server error page: StatusInternalServerError (500)
+		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+		serverErrorPage.Render(r.Context(), w)
 		return
 	}
 
@@ -35,14 +38,16 @@ func ServeCallbackPage(w http.ResponseWriter, r *http.Request, authenticator *au
 	userDataFromToken, err := authenticator.ExtractUserProfileInfo(cfg, token.AccessToken)
 	if err != nil {
 		log.Println(err)
-		// Server error page: StatusInternalServerError (500)
+		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+		serverErrorPage.Render(r.Context(), w)
 		return
 	}
 
 	err = cfg.DBQueries.InsertUser(context.Background(), userDataFromToken)
 	if err != nil {
 		log.Printf("failed to insert user into DB. Err: %v", err)
-		// Server error page: StatusInternalServerError (500)
+		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+		serverErrorPage.Render(r.Context(), w)
 		return
 	}
 
@@ -51,13 +56,15 @@ func ServeCallbackPage(w http.ResponseWriter, r *http.Request, authenticator *au
 	userSession, err := auth.NewUserSession(cfg, token.AccessToken)
 	if err != nil {
 		log.Println(err)
-		// Server error page: StatusInternalServerError (500)
+		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+		serverErrorPage.Render(r.Context(), w)
 		return
 	}
 	err = userSession.StoreSession(r.Context(), cfg)
 	if err != nil {
 		log.Println(err)
-		// Server error page: StatusInternalServerError (500)
+		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+		serverErrorPage.Render(r.Context(), w)
 		return
 	}
 
@@ -68,5 +75,6 @@ func ServeCallbackPage(w http.ResponseWriter, r *http.Request, authenticator *au
 		Secure:   false,
 		HttpOnly: true,
 	})
+	cfg.AuthStatus = true
 	http.Redirect(w, r, "/resource", http.StatusTemporaryRedirect)
 }

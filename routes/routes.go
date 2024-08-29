@@ -31,6 +31,7 @@ func init() {
 	config.LoadEnv(appConfig)
 
 	appConfig.PkceCodeVerifier = oauth2.GenerateVerifier()
+	appConfig.AuthStatus = false
 
 	dbService = config.NewDatabaseService(appConfig)
 	appConfig.DBQueries = database.New(dbService.DatabaseClient)
