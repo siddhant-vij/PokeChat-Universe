@@ -5,7 +5,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/siddhant-vij/PokeChat-Universe/database"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
 )
 
 type AppConfig struct {
@@ -20,7 +20,7 @@ type AppConfig struct {
 	RedisDatabase string
 	RedisPassword string
 
-	DBQueries   *database.Queries
+	DBQueries   *pokedex.Queries
 	RedisClient *redis.Client
 
 	AuthDomain       string

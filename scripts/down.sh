@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source .env
-cd sql/schema
+cd scripts/sql/schema
 
 countFiles=$(ls -1q . | wc -l)
 if [ $countFiles -gt 0 ];

@@ -1,8 +1,8 @@
 version: "2"
 sql:
-  - schema: "sql/schema"
-    queries: "sql/queries"
+  - schema: "scripts/sql/schema"
+    queries: "scripts/sql/queries"
     engine: "postgresql"
     gen:
       go:
-        out: "database"
+        out: "controllers/pokedex"

@@ -12,7 +12,7 @@ import (
 	"github.com/siddhant-vij/PokeChat-Universe/config"
 	"github.com/siddhant-vij/PokeChat-Universe/config/client"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/auth"
-	"github.com/siddhant-vij/PokeChat-Universe/database"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
 	"github.com/siddhant-vij/PokeChat-Universe/middlewares"
 	authroutes "github.com/siddhant-vij/PokeChat-Universe/routes/auth"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/crud"
@@ -35,7 +35,7 @@ func init() {
 	appConfig.AuthStatus = false
 
 	dbService = config.NewDatabaseService(appConfig)
-	appConfig.DBQueries = database.New(dbService.DatabaseClient)
+	appConfig.DBQueries = pokedex.New(dbService.DatabaseClient)
 
 	redisService = config.NewRedisService(appConfig)
 	appConfig.RedisClient = redisService.RedisClient

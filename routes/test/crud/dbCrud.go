@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/siddhant-vij/PokeChat-Universe/config"
-	"github.com/siddhant-vij/PokeChat-Universe/database"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
 )
 
 var (
@@ -20,7 +20,7 @@ var (
 )
 
 func DbCreateHandler(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
-	testUser := database.InsertUserParams{
+	testUser := pokedex.InsertUserParams{
 		ID:         testUserId,
 		AuthID:     testAuthID,
 		Username:   testUsername,
@@ -46,7 +46,7 @@ func DbReadHandler(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig
 }
 
 func DbUpdateHandler(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
-	emailUpdateParams := database.UpdateUserEmailByIDParams{
+	emailUpdateParams := pokedex.UpdateUserEmailByIDParams{
 		ID:    testUserId,
 		Email: "test@gmail.com",
 	}

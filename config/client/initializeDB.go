@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/siddhant-vij/PokeChat-Universe/config"
-	"github.com/siddhant-vij/PokeChat-Universe/database"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
 )
 
 type pokemonFromAPI struct {
@@ -120,7 +120,7 @@ func insertPokemonDataIntoDB(cfg *config.AppConfig, pokemonData pokemonFromAPI) 
 		types = append(types, t.Type.Name)
 	}
 
-	var insertPokemonParams = database.InsertPokemonParams{
+	var insertPokemonParams = pokedex.InsertPokemonParams{
 		ID:             int32(pokemonData.Id),
 		Name:           pokemonData.Name,
 		Height:         int32(pokemonData.Height),
@@ -156,11 +156,11 @@ func insertPokemonDataIntoDB(cfg *config.AppConfig, pokemonData pokemonFromAPI) 
 }
 
 type updatePokemonDB struct {
-	insertParam database.InsertPokemonParams
+	insertParam pokedex.InsertPokemonParams
 	CreatedAt   time.Time
 }
 
-func isPokemonUpdatable(insertPokemonParams database.InsertPokemonParams, cfg *config.AppConfig) (updatePokemonDB, bool) {
+func isPokemonUpdatable(insertPokemonParams pokedex.InsertPokemonParams, cfg *config.AppConfig) (updatePokemonDB, bool) {
 	var updateParams updatePokemonDB
 	updateParams.insertParam = insertPokemonParams
 
@@ -202,16 +202,16 @@ func isPokemonUpdatable(insertPokemonParams database.InsertPokemonParams, cfg *c
 	}
 }
 
-func getPokemonDataById(id int32, cfg *config.AppConfig) (database.Pokemon, error) {
+func getPokemonDataById(id int32, cfg *config.AppConfig) (pokedex.Pokemon, error) {
 	pokemon, err := cfg.DBQueries.GetPokemonByID(context.Background(), id)
 	if err != nil {
-		return database.Pokemon{}, fmt.Errorf("error getting pokemon with id: %d from DB while checking if it's updatable. Err: %w", id, err)
+		return pokedex.Pokemon{}, fmt.Errorf("error getting pokemon with id: %d from DB while checking if it's updatable. Err: %w", id, err)
 	}
 	return pokemon, nil
 }
 
 func updatePokemonById(pokemon updatePokemonDB, cfg *config.AppConfig) error {
-	updateParams := database.UpdatePokemonByIDParams{
+	updateParams := pokedex.UpdatePokemonByIDParams{
 		ID:             pokemon.insertParam.ID,
 		CreatedAt:      pokemon.CreatedAt,
 		Name:           pokemon.insertParam.Name,
@@ -238,7 +238,7 @@ func insertEvolutionChainDataIntoDB(cfg *config.AppConfig, evolutionChainData ev
 	extractPokemonIDs(&evolutionChainData.Chain, &pokemonEvolutionIDs)
 
 	for i := 0; i < len(pokemonEvolutionIDs); i++ {
-		var insertPokemonEvolutionParams = database.InsertPokemonEvolutionParams{
+		var insertPokemonEvolutionParams = pokedex.InsertPokemonEvolutionParams{
 			ChainID:   int32(chainId),
 			PokemonID: int32(pokemonEvolutionIDs[i]),
 		}

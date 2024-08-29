@@ -3,7 +3,7 @@
 //   sqlc v1.26.0
 // source: pokemons.sql
 
-package database
+package pokedex
 
 import (
 	"context"

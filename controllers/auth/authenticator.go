@@ -10,7 +10,7 @@ import (
 	"golang.org/x/oauth2"
 
 	"github.com/siddhant-vij/PokeChat-Universe/config"
-	"github.com/siddhant-vij/PokeChat-Universe/database"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
 )
 
 type Authenticator struct {
@@ -44,14 +44,14 @@ func NewAuthenticator(cfg *config.AppConfig) *Authenticator {
 	}
 }
 
-func (a *Authenticator) ExtractUserProfileInfo(cfg *config.AppConfig, accessToken string) (database.InsertUserParams, error) {
+func (a *Authenticator) ExtractUserProfileInfo(cfg *config.AppConfig, accessToken string) (pokedex.InsertUserParams, error) {
 	data := &UserInfoData{}
 	err := do(cfg.AuthDomain, "userinfo", accessToken, data)
 	if err != nil {
-		return database.InsertUserParams{}, err
+		return pokedex.InsertUserParams{}, err
 	}
 
-	var insertUserParams = database.InsertUserParams{
+	var insertUserParams = pokedex.InsertUserParams{
 		ID:         uuid.New(),
 		AuthID:     data.AuthId,
 		Username:   extractName(data),
