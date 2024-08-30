@@ -147,6 +147,12 @@ func PageHandlers(mux *http.ServeMux) {
 	}))
 
 	mux.Handle("/pokedex", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ServePokedexPage), appConfig))
+
+	mux.HandleFunc("/getPokemon", pokedexroutes.GetPokemonHandler)
+
+	mux.Handle("/{pokemonName}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.ServePokemonPage(w, r, appConfig)
+	}))
 }
 
 func PokedexHandlers(mux *http.ServeMux) {

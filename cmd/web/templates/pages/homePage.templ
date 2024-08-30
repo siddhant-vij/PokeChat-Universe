@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"fmt"
 	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
 )
@@ -52,14 +53,26 @@ templ HomeAvailablePokemonCard(pokemon utils.HomeAvailablePokemon) {
 			/>
 		</figure>
 		<div class="card-body">
-			<h3 class="text-base">{ pokemon.ID }</h3>
-			<h2 class="card-title text-2xl pb-2">{ pokemon.Name }</h2>
-			<div class="card-actions justify-center pb-4">
-				for _, pokemonType := range pokemon.Types {
-					<div class="badge badge-outline text-xs h-8 leading-8 pl-8 pr-8">{ pokemonType }</div>
-				}
+			<div class="flex flex-row justify-between">
+				<h3 class="text-base">{ pokemon.ID }</h3>
+				<div>
+					for _, pokemonType := range pokemon.Types {
+						<div class="badge badge-outline text-xs h-6 leading-6 pl-4 pr-4 ml-1">{ pokemonType }</div>
+					}
+				</div>
 			</div>
-			<button class="btn btn-success">Collect</button>
+			<h2 class="card-title text-2xl py-2 pb-4">{ pokemon.Name }</h2>
+			<div class="flex flex-row justify-between">
+				<button
+					class="btn btn-outline btn-primary"
+					hx-get="/getPokemon"
+					hx-trigger="click"
+					hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, utils.DeformatName(pokemon.Name)) }
+				>
+					View Details
+				</button>
+				<button class="btn btn-outline btn-ghost tooltip tooltip-success cursor-default" data-tip="Login to collect">Collect</button>
+			</div>
 		</div>
 	</div>
 }
