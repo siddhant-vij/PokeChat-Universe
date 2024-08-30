@@ -44,3 +44,43 @@ WHERE id = $1;
 -- name: DeletePokemonByID :exec
 DELETE FROM pokemons
 WHERE id = $1;
+
+-- name: GetPokemonsSortedByIdAsc :many
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+ORDER BY pokemons.id ASC
+LIMIT $1 OFFSET $2;
+
+-- name: GetPokemonsSortedByIdDesc :many
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+ORDER BY pokemons.id DESC
+LIMIT $1 OFFSET $2;
+
+-- name: GetPokemonsSortedByNameAsc :many
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+ORDER BY pokemons.name ASC
+LIMIT $1 OFFSET $2;
+
+-- name: GetPokemonsSortedByNameDesc :many
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+ORDER BY pokemons.name DESC
+LIMIT $1 OFFSET $2;

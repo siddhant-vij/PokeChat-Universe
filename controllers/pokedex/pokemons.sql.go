@@ -110,6 +110,210 @@ func (q *Queries) GetPokemonDetailsByName(ctx context.Context, name string) (Pok
 	return i, err
 }
 
+const getPokemonsSortedByIdAsc = `-- name: GetPokemonsSortedByIdAsc :many
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+ORDER BY pokemons.id ASC
+LIMIT $1 OFFSET $2
+`
+
+type GetPokemonsSortedByIdAscParams struct {
+	Limit  int32
+	Offset int32
+}
+
+type GetPokemonsSortedByIdAscRow struct {
+	ID         int32
+	Name       string
+	PictureUrl string
+	Types      []string
+}
+
+func (q *Queries) GetPokemonsSortedByIdAsc(ctx context.Context, arg GetPokemonsSortedByIdAscParams) ([]GetPokemonsSortedByIdAscRow, error) {
+	rows, err := q.db.QueryContext(ctx, getPokemonsSortedByIdAsc, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetPokemonsSortedByIdAscRow
+	for rows.Next() {
+		var i GetPokemonsSortedByIdAscRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.PictureUrl,
+			pq.Array(&i.Types),
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPokemonsSortedByIdDesc = `-- name: GetPokemonsSortedByIdDesc :many
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+ORDER BY pokemons.id DESC
+LIMIT $1 OFFSET $2
+`
+
+type GetPokemonsSortedByIdDescParams struct {
+	Limit  int32
+	Offset int32
+}
+
+type GetPokemonsSortedByIdDescRow struct {
+	ID         int32
+	Name       string
+	PictureUrl string
+	Types      []string
+}
+
+func (q *Queries) GetPokemonsSortedByIdDesc(ctx context.Context, arg GetPokemonsSortedByIdDescParams) ([]GetPokemonsSortedByIdDescRow, error) {
+	rows, err := q.db.QueryContext(ctx, getPokemonsSortedByIdDesc, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetPokemonsSortedByIdDescRow
+	for rows.Next() {
+		var i GetPokemonsSortedByIdDescRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.PictureUrl,
+			pq.Array(&i.Types),
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPokemonsSortedByNameAsc = `-- name: GetPokemonsSortedByNameAsc :many
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+ORDER BY pokemons.name ASC
+LIMIT $1 OFFSET $2
+`
+
+type GetPokemonsSortedByNameAscParams struct {
+	Limit  int32
+	Offset int32
+}
+
+type GetPokemonsSortedByNameAscRow struct {
+	ID         int32
+	Name       string
+	PictureUrl string
+	Types      []string
+}
+
+func (q *Queries) GetPokemonsSortedByNameAsc(ctx context.Context, arg GetPokemonsSortedByNameAscParams) ([]GetPokemonsSortedByNameAscRow, error) {
+	rows, err := q.db.QueryContext(ctx, getPokemonsSortedByNameAsc, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetPokemonsSortedByNameAscRow
+	for rows.Next() {
+		var i GetPokemonsSortedByNameAscRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.PictureUrl,
+			pq.Array(&i.Types),
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPokemonsSortedByNameDesc = `-- name: GetPokemonsSortedByNameDesc :many
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+ORDER BY pokemons.name DESC
+LIMIT $1 OFFSET $2
+`
+
+type GetPokemonsSortedByNameDescParams struct {
+	Limit  int32
+	Offset int32
+}
+
+type GetPokemonsSortedByNameDescRow struct {
+	ID         int32
+	Name       string
+	PictureUrl string
+	Types      []string
+}
+
+func (q *Queries) GetPokemonsSortedByNameDesc(ctx context.Context, arg GetPokemonsSortedByNameDescParams) ([]GetPokemonsSortedByNameDescRow, error) {
+	rows, err := q.db.QueryContext(ctx, getPokemonsSortedByNameDesc, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetPokemonsSortedByNameDescRow
+	for rows.Next() {
+		var i GetPokemonsSortedByNameDescRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.PictureUrl,
+			pq.Array(&i.Types),
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertPokemon = `-- name: InsertPokemon :exec
 INSERT INTO pokemons
   (id, name, height, weight, picture_url, base_experience, types, hp, attack, defense, special_attack, special_defense, speed)

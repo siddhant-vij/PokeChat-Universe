@@ -73,6 +73,7 @@ func RegisterRoutes(mux *http.ServeMux) {
 
 	// Handlers for App Workflow - Pokedex
 	PokedexHandlers(mux)
+	LoadMoreHandlers(mux)
 }
 
 func HealthHandlers(mux *http.ServeMux) {
@@ -141,7 +142,9 @@ func AuthHandlers(mux *http.ServeMux) {
 }
 
 func PageHandlers(mux *http.ServeMux) {
-	mux.HandleFunc("/", http.HandlerFunc(pokedexroutes.ServeHomePage))
+	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.ServeHomePage(w, r, appConfig)
+	}))
 
 	mux.Handle("/pokedex", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ServePokedexPage), appConfig))
 }
@@ -152,4 +155,10 @@ func PokedexHandlers(mux *http.ServeMux) {
 	mux.Handle("/collected", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.CollectedPokedexHandler), appConfig))
 
 	mux.Handle("/chat", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatPokedexHandler), appConfig))
+}
+
+func LoadMoreHandlers(mux *http.ServeMux) {
+	mux.Handle("/home-load-more", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.HomeAvailableLoadMore(w, r, appConfig)
+	}))
 }

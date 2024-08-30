@@ -1,8 +1,11 @@
 package pages
 
-import "github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
+import (
+	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
+)
 
-templ HomePage() {
+templ HomePage(homeAvailable []utils.HomeAvailablePokemon) {
 	<!DOCTYPE html>
 	<html>
 		<head>
@@ -14,9 +17,9 @@ templ HomePage() {
 			<title>PokeChat Universe</title>
 		</head>
 		<body class="bg-zinc-600 scroll-smooth">
-			<div class="flex flex-col w-[1024px] mx-auto h-screen">
+			<div class="flex flex-col w-[1024px] mx-auto min-h-screen">
 				@components.Header(false, false)
-				@HomeTemp()
+				@HomeTemp(homeAvailable)
 				<hr/>
 				@components.Footer()
 			</div>
@@ -24,14 +27,53 @@ templ HomePage() {
 	</html>
 }
 
-templ HomeTemp() {
+templ HomeTemp(homeAvailable []utils.HomeAvailablePokemon) {
 	<main class="flex-grow">
-		<div class="p-8 bg-base-100 h-full flex justify-center">
-			<div class="text-center">
-				<div class="pt-48">
-					<h1 id="page-details" class="text-3xl font-bold">Home Page - Available Tab</h1>
-				</div>
-			</div>
-		</div>
+		@ListOfPokemons(homeAvailable)
+		@LoadMoreButton()
 	</main>
+}
+
+templ ListOfPokemons(homeAvailable []utils.HomeAvailablePokemon) {
+	<div id="home-available" class="p-8 bg-base-100 grid grid-cols-3 justify-center justify-items-center content-center gap-y-8">
+		for _, pokemon := range homeAvailable {
+			@HomeAvailablePokemonCard(pokemon)
+		}
+	</div>
+}
+
+templ HomeAvailablePokemonCard(pokemon utils.HomeAvailablePokemon) {
+	<div class="card bg-base-300 w-72 shadow-xl hover:scale-105">
+		<figure>
+			<img
+				src={ pokemon.PictureUrl }
+				alt={ pokemon.Name }
+				class="p-8 pb-0"
+			/>
+		</figure>
+		<div class="card-body">
+			<h3 class="text-base">{ pokemon.ID }</h3>
+			<h2 class="card-title text-2xl pb-2">{ pokemon.Name }</h2>
+			<div class="card-actions justify-center pb-4">
+				for _, pokemonType := range pokemon.Types {
+					<div class="badge badge-outline text-xs h-8 leading-8 pl-8 pr-8">{ pokemonType }</div>
+				}
+			</div>
+			<button class="btn btn-success">Collect</button>
+		</div>
+	</div>
+}
+
+templ LoadMoreButton() {
+	<div class="p-8 bg-base-100 grid grid-cols-1 justify-center justify-items-center content-center gap-y-8">
+		<button
+			class="btn btn-active btn-primary"
+			hx-get="/home-load-more"
+			hx-trigger="click"
+			hx-target="#home-available"
+			hx-swap="beforeend"
+		>
+			Load more Pokemon
+		</button>
+	</div>
 }
