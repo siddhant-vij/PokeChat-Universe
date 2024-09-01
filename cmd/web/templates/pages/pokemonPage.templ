@@ -1,8 +1,13 @@
 package pages
 
-import "github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
+import (
+	"fmt"
+	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
+)
 
-templ PokemonPage(pokemon string, authStatus bool) {
+templ PokemonPage(pokemon pokedex.Pokemon, authStatus, isCollected bool, evolutionChain []pokedex.GetFullEvolutionChainRow) {
 	<!DOCTYPE html>
 	<html>
 		<head>
@@ -14,9 +19,9 @@ templ PokemonPage(pokemon string, authStatus bool) {
 			<title>PokeChat Universe</title>
 		</head>
 		<body class="bg-zinc-600 scroll-smooth">
-			<div class="flex flex-col w-[1024px] mx-auto h-screen">
+			<div class="flex flex-col w-[1024px] mx-auto min-h-screen">
 				@components.Header(true, authStatus)
-				@PokemonTemp(pokemon)
+				@PokemonDetails(pokemon, isCollected, authStatus, evolutionChain)
 				<hr/>
 				@components.Footer()
 			</div>
@@ -24,14 +29,144 @@ templ PokemonPage(pokemon string, authStatus bool) {
 	</html>
 }
 
-templ PokemonTemp(pokemon string) {
+templ PokemonDetails(pokemon pokedex.Pokemon, authStatus, isCollected bool, evolutionChain []pokedex.GetFullEvolutionChainRow) {
 	<main class="flex-grow">
-		<div class="p-8 bg-base-100 h-full flex justify-center">
-			<div class="text-center">
-				<div class="pt-48">
-					<h1 id="page-details" class="text-3xl font-bold">Pokemon Page - { pokemon }!</h1>
+		<div class="p-8 bg-base-100 flex flex-col">
+			@PokemonHeader(utils.FormatID(int(pokemon.ID)), utils.FormatName(pokemon.Name))
+			@PokemonCard(pokemon.Name, pokemon.PictureUrl, utils.FormatHeight(pokemon.Height), utils.FormatWeight(pokemon.Weight), utils.FormatBaseExp(pokemon.BaseExperience), utils.DisplayTypes(pokemon.Types))
+			@PokemonStats(utils.GetStats(pokemon), utils.GetMaxStats())
+			@EvolutionCard(evolutionChain)
+			@PokemonFooter(utils.FormatName(pokemon.Name), authStatus, isCollected)
+		</div>
+	</main>
+}
+
+templ PokemonHeader(id, name string) {
+	<div class="flex flex-row justify-center gap-8">
+		<h1 class="text-3xl font-extrabold">{ name }</h1>
+		<h1 class="text-3xl">{ id }</h1>
+	</div>
+}
+
+templ PokemonCard(name, pictureUrl, height, weight, baseExp string, types []string) {
+	<div class="flex flex-row justify-center gap-8">
+		<figure class="basis-1/2 hover:scale-110">
+			<img
+				src={ pictureUrl }
+				alt={ name }
+				class="p-8"
+			/>
+		</figure>
+		<div class="basis-1/2 my-16 mr-12 card bg-primary text-primary-content">
+			<div class="card-body flex flex-col justify-around">
+				<div class="flex flex-row justify-normal gap-8">
+					<h2 class="card-title font-medium">Height: <span class="font-semibold">{ height }</span></h2>
+					<h2 class="card-title font-medium">Weight: <span class="font-semibold">{ weight }</span></h2>
+				</div>
+				<h2 class="card-title font-medium">Base Experience: <span class="font-semibold">{ baseExp }</span></h2>
+				<div class="flex flex-row justify-normal gap-4">
+					<h2 class="card-title font-medium">Types:</h2>
+					<div class="flex flex-row justify-normal gap-4">
+						for _, pokemonType := range types {
+							<div class="badge badge-outline text-sm h-10 pl-8 pr-8">{ pokemonType }</div>
+						}
+					</div>
 				</div>
 			</div>
 		</div>
-	</main>
+	</div>
+}
+
+css height(stat, maxStat int) {
+	height: { templ.SafeCSSProperty(fmt.Sprintf("%d%%", stat*100/maxStat)) };
+}
+
+templ PokemonStats(stats, maxStats []int) {
+	<div class="flex flex-row justify-around rounded-xl bg-neutral mb-16 px-16 pb-8 pt-12">
+		for i := 0; i < 6; i++ {
+			<div class="flex flex-col items-center gap-2">
+				<div class="h-48 w-12 bg-gray-100 relative rounded-sm">
+					<div class={ "w-full bg-primary absolute bottom-0 rounded-sm tooltip", height(stats[i], maxStats[i]) } data-tip={ fmt.Sprintf("%d%%", stats[i]*100/maxStats[i]) }></div>
+				</div>
+				<h2 class="text-lg font-extrabold text-center">
+					switch i {
+						case 0:
+							HP
+						case 1:
+							Attack
+						case 2:
+							Defense
+						case 3:
+							Sp. Attack
+						case 4:
+							Sp. Defense
+						case 5:
+							Speed
+					}
+				</h2>
+			</div>
+		}
+	</div>
+}
+
+templ EvolutionCard(evolutionChain []pokedex.GetFullEvolutionChainRow) {
+	<div class="flex flex-col rounded-xl bg-neutral mb-10 p-8">
+		<h2 class="card-title font-medium text-2xl">Evolutions</h2>
+		<br/>
+		<div class="flex flex-row justify-center gap-10">
+			for id, evolution := range evolutionChain {
+				if id == len(evolutionChain)-1 {
+					<div class="flex flex-col justify-center">
+						<a href={ templ.SafeURL(fmt.Sprintf("/%s", evolution.Name)) }>
+							<figure class="w-56">
+								<img
+									src={ evolution.PictureUrl }
+									alt={ evolution.Name }
+								/>
+							</figure>
+						</a>
+						<div class="flex flex-row justify-center gap-4 mb-4">
+							<h1 class="text-xl font-extrabold">{ utils.FormatName(evolution.Name) }</h1>
+							<h1 class="text-xl">{ utils.FormatID(int(evolution.ID)) }</h1>
+						</div>
+					</div>
+				} else {
+					<div class="flex flex-col justify-center">
+						<a href={ templ.SafeURL(fmt.Sprintf("/%s", evolution.Name)) }>
+							<figure class="w-56">
+								<img
+									src={ evolution.PictureUrl }
+									alt={ evolution.Name }
+								/>
+							</figure>
+						</a>
+						<div class="flex flex-row justify-center gap-4 mb-4">
+							<h1 class="text-xl font-extrabold">{ utils.FormatName(evolution.Name) }</h1>
+							<h1 class="text-xl">{ utils.FormatID(int(evolution.ID)) }</h1>
+						</div>
+					</div>
+					<div class="flex flex-col justify-center">
+						<p class="text-5xl font-extrabold">></p>
+					</div>
+				}
+			}
+		</div>
+	</div>
+}
+
+templ PokemonFooter(name string, authStatus, isCollected bool) {
+	<div class="flex flex-row justify-center gap-10">
+		<a href="/pokedex">
+			<button class="btn btn-outline btn-primary">Explore more Pokemon</button>
+		</a>
+		if authStatus {
+			if isCollected {
+				<button class="btn btn-success">Chat with { name }</button>
+			} else {
+				<button class="btn btn-success">Collect { name }</button>
+			}
+		} else {
+			<button class="btn btn-outline btn-ghost tooltip tooltip-success cursor-default" data-tip="Login to collect">Collect { name }</button>
+		}
+	</div>
 }
