@@ -80,6 +80,7 @@ templ HomeAvailablePokemonCard(pokemon utils.HomeAvailablePokemon) {
 templ LoadMoreButton() {
 	<div class="p-8 bg-base-100 grid grid-cols-1 justify-center justify-items-center content-center gap-y-8">
 		<button
+			id="homeLoadMoreBtn"
 			class="btn btn-active btn-primary"
 			hx-get="/home-load-more"
 			hx-trigger="click"
@@ -88,5 +89,15 @@ templ LoadMoreButton() {
 		>
 			Load more Pokemon
 		</button>
+	</div>
+}
+
+templ LoadMoreButtonDisabled() {
+	<div class="p-8 bg-base-100 grid grid-cols-1 justify-center justify-items-center content-center gap-y-8">
+		<button
+			id="homeLoadMoreBtn"
+			class="btn btn-disabled"
+			hx-swap-oob="outerHTML:#homeLoadMoreBtn"
+		>Load more Pokemon</button>
 	</div>
 }

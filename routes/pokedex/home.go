@@ -74,4 +74,9 @@ func HomeAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *config.A
 		pokemonCard := pages.HomeAvailablePokemonCard(pokemon)
 		pokemonCard.Render(r.Context(), w)
 	}
+
+	if len(pokemonList) < 12 {
+		loadMoreBtnDisabled := pages.LoadMoreButtonDisabled()
+		loadMoreBtnDisabled.Render(r.Context(), w)
+	}
 }
