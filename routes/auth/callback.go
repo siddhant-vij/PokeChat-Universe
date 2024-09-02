@@ -75,6 +75,15 @@ func ServeCallbackPage(w http.ResponseWriter, r *http.Request, authenticator *au
 		Secure:   false,
 		HttpOnly: true,
 	})
+
+	userId, err := cfg.DBQueries.GetUserIdFromAuthID(context.Background(), userDataFromToken.AuthID)
+	if err != nil {
+		log.Printf("failed to get user id from auth id. Err: %v", err)
+		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+		serverErrorPage.Render(r.Context(), w)
+		return
+	}
+	cfg.LoggedInUserId = userId
 	cfg.AuthStatus = true
 	http.Redirect(w, r, "/pokedex", http.StatusTemporaryRedirect)
 }

@@ -21,26 +21,6 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-const getUserByAuthID = `-- name: GetUserByAuthID :one
-SELECT id, created_at, updated_at, auth_id, username, email, picture_url FROM users
-WHERE auth_id = $1 LIMIT 1
-`
-
-func (q *Queries) GetUserByAuthID(ctx context.Context, authID string) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByAuthID, authID)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.AuthID,
-		&i.Username,
-		&i.Email,
-		&i.PictureUrl,
-	)
-	return i, err
-}
-
 const getUserByID = `-- name: GetUserByID :one
 SELECT id, created_at, updated_at, auth_id, username, email, picture_url FROM users
 WHERE id = $1 LIMIT 1
@@ -59,6 +39,18 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.PictureUrl,
 	)
 	return i, err
+}
+
+const getUserIdFromAuthID = `-- name: GetUserIdFromAuthID :one
+SELECT id FROM users
+WHERE auth_id = $1 LIMIT 1
+`
+
+func (q *Queries) GetUserIdFromAuthID(ctx context.Context, authID string) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, getUserIdFromAuthID, authID)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const insertUser = `-- name: InsertUser :exec

@@ -3,6 +3,7 @@ package config
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
@@ -34,4 +35,5 @@ type AppConfig struct {
 	UserAgent           string
 	AccessTokenIssuedAt time.Time
 	AuthStatus          bool
+	LoggedInUserId      uuid.UUID
 }

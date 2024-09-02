@@ -9,8 +9,8 @@ ON CONFLICT (auth_id) DO NOTHING;
 SELECT * FROM users
 WHERE id = $1 LIMIT 1;
 
--- name: GetUserByAuthID :one
-SELECT * FROM users
+-- name: GetUserIdFromAuthID :one
+SELECT id FROM users
 WHERE auth_id = $1 LIMIT 1;
 
 -- name: UpdateUserEmailByID :exec
