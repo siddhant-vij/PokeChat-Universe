@@ -32,7 +32,7 @@ templ HomeDetails(homeAvailable []utils.HomeAvailablePokemon) {
 	<main class="flex-grow">
 		@SearchAndSort()
 		@ListOfPokemons(homeAvailable)
-		@LoadMoreButton()
+		@HomeLoadMoreIdAscButton()
 	</main>
 }
 
@@ -52,20 +52,24 @@ templ SearchAndSort() {
 				autofocus
 				placeholder="Enter Pokemon Name"
 				name="pokemonName"
-				hx-post="/home-search"
+				hx-get="/home-search"
 				hx-trigger="input changed delay:500ms"
 				hx-target="#home-available"
-				hx-indicator=".htmx-indicator"
 			/>
-			<span class="htmx-indicator loading loading-spinner text-primary"></span>
 		</label>
-		<select class="select select-bordered w-80">
-			<option disabled selected class="text-sm">Sort Pokemon List By</option>
-			<option>Lowest ID - First</option>
-			<option>Highest ID - First</option>
-			<option>A - Z</option>
-			<option>Z - A</option>
-		</select>
+		<form
+			hx-get="/home-sort"
+			hx-trigger="change"
+			hx-target="#home-available"
+		>
+			<select class="select select-bordered w-80" name="sort-by">
+				<option disabled selected class="text-sm">Sort Pokemon List By</option>
+				<option selected="selected" value="id-asc">Lowest ID - First</option>
+				<option value="id-desc">Highest ID - First</option>
+				<option value="name-asc">A - Z</option>
+				<option value="name-desc">Z - A</option>
+			</select>
+		</form>
 	</div>
 }
 
@@ -111,7 +115,7 @@ templ HomeAvailablePokemonCard(pokemon utils.HomeAvailablePokemon) {
 	</div>
 }
 
-templ LoadMoreButton() {
+templ HomeLoadMoreIdAscButton() {
 	<div class="p-8 grid grid-cols-1 justify-center justify-items-center content-center gap-y-8">
 		<button
 			id="homeLoadMoreBtn"
@@ -120,16 +124,78 @@ templ LoadMoreButton() {
 			hx-trigger="click"
 			hx-target="#home-available"
 			hx-swap="beforeend"
+			hx-vals='{"sort-by": "id-asc"}'
 		>
 			Load more Pokemon
 		</button>
 	</div>
 }
 
+templ LoadMoreIdAscButton() {
+	<button
+		id="homeLoadMoreBtn"
+		class="btn btn-active btn-primary"
+		hx-get="/home-load-more"
+		hx-trigger="click"
+		hx-target="#home-available"
+		hx-swap="beforeend"
+		hx-vals='{"sort-by": "id-asc"}'
+		hx-swap-oob="outerHTML:#homeLoadMoreBtn"
+	>
+		Load more Pokemon
+	</button>
+}
+
+templ LoadMoreIdDescButton() {
+	<button
+		id="homeLoadMoreBtn"
+		class="btn btn-active btn-primary"
+		hx-get="/home-load-more"
+		hx-trigger="click"
+		hx-target="#home-available"
+		hx-swap="beforeend"
+		hx-vals='{"sort-by": "id-desc"}'
+		hx-swap-oob="outerHTML:#homeLoadMoreBtn"
+	>
+		Load more Pokemon
+	</button>
+}
+
+templ LoadMoreNameAscButton() {
+	<button
+		id="homeLoadMoreBtn"
+		class="btn btn-active btn-primary"
+		hx-get="/home-load-more"
+		hx-trigger="click"
+		hx-target="#home-available"
+		hx-swap="beforeend"
+		hx-vals='{"sort-by": "name-asc"}'
+		hx-swap-oob="outerHTML:#homeLoadMoreBtn"
+	>
+		Load more Pokemon
+	</button>
+}
+
+templ LoadMoreNameDescButton() {
+	<button
+		id="homeLoadMoreBtn"
+		class="btn btn-active btn-primary"
+		hx-get="/home-load-more"
+		hx-trigger="click"
+		hx-target="#home-available"
+		hx-swap="beforeend"
+		hx-vals='{"sort-by": "name-desc"}'
+		hx-swap-oob="outerHTML:#homeLoadMoreBtn"
+	>
+		Load more Pokemon
+	</button>
+}
+
 templ LoadMoreButtonDisabled() {
 	<button
 		id="homeLoadMoreBtn"
-		class="btn btn-disabled"
+		class="btn btn-outline btn-ghost tooltip tooltip-success cursor-default"
+		data-tip="No more Pokemon to load"
 		hx-swap-oob="outerHTML:#homeLoadMoreBtn"
 	>
 		Load more Pokemon

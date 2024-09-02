@@ -174,4 +174,8 @@ func SearchAndSortHandlers(mux *http.ServeMux) {
 	mux.Handle("/home-search", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.HomeAvailableSearch(w, r, appConfig)
 	}))
+
+	mux.Handle("/home-sort", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.HomeAvailableSort(w, r, appConfig)
+	}))
 }
