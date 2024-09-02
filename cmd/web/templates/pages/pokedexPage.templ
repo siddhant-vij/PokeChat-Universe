@@ -14,9 +14,9 @@ templ PokedexPage() {
 			<title>PokeChat Universe</title>
 		</head>
 		<body class="bg-zinc-600 scroll-smooth">
-			<div class="flex flex-col w-[1024px] mx-auto h-screen">
+			<div class="flex flex-col w-[1024px] mx-auto min-h-screen bg-base-100">
 				@components.Header(false, true)
-				@PokedexTemp()
+				@InitialPokedexAvailable()
 				<hr/>
 				@components.Footer()
 			</div>
@@ -24,9 +24,9 @@ templ PokedexPage() {
 	</html>
 }
 
-templ PokedexTemp() {
+templ InitialPokedexAvailable() {
 	<main class="flex-grow">
-		<div class="p-8 bg-base-100 h-full flex justify-center">
+		<div class="p-8 h-full flex justify-center">
 			<div class="text-center">
 				<div class="pt-48">
 					<h1 id="page-details" class="text-3xl font-bold">Resource Page - Available Tab</h1>
@@ -34,16 +34,4 @@ templ PokedexTemp() {
 			</div>
 		</div>
 	</main>
-}
-
-templ AvailableTemp() {
-	<h1 id="page-details" class="text-3xl font-bold">Resource Page - Available Tab</h1>
-}
-
-templ CollectedTemp() {
-	<h1 id="page-details" class="text-3xl font-bold">Resource Page - Collected Tab</h1>
-}
-
-templ ChatTemp() {
-	<h1 id="page-details" class="text-3xl font-bold">Resource Page - Chat Tab</h1>
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
 )
 
-templ HomePage(homeAvailable []utils.HomeAvailablePokemon) {
+templ HomePage(homeAvailable []utils.PokemonDisplay) {
 	<!DOCTYPE html>
 	<html>
 		<head>
@@ -28,7 +28,7 @@ templ HomePage(homeAvailable []utils.HomeAvailablePokemon) {
 	</html>
 }
 
-templ HomeDetails(homeAvailable []utils.HomeAvailablePokemon) {
+templ HomeDetails(homeAvailable []utils.PokemonDisplay) {
 	<main class="flex-grow">
 		@SearchAndSort()
 		@ListOfPokemons(homeAvailable)
@@ -73,7 +73,7 @@ templ SearchAndSort() {
 	</div>
 }
 
-templ ListOfPokemons(homeAvailable []utils.HomeAvailablePokemon) {
+templ ListOfPokemons(homeAvailable []utils.PokemonDisplay) {
 	<div id="home-available" class="p-8 grid grid-cols-3 justify-center justify-items-center content-center gap-y-8">
 		for _, pokemon := range homeAvailable {
 			@HomeAvailablePokemonCard(pokemon)
@@ -81,7 +81,7 @@ templ ListOfPokemons(homeAvailable []utils.HomeAvailablePokemon) {
 	</div>
 }
 
-templ HomeAvailablePokemonCard(pokemon utils.HomeAvailablePokemon) {
+templ HomeAvailablePokemonCard(pokemon utils.PokemonDisplay) {
 	<div class="card bg-base-300 w-72 shadow-xl hover:scale-105">
 		<figure>
 			<img

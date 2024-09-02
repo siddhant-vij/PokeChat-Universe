@@ -7,13 +7,6 @@ import (
 	"strings"
 )
 
-type HomeAvailablePokemon struct {
-	ID         string
-	Name       string
-	PictureUrl string
-	Types      []string
-}
-
 func FormatID(id int) string {
 	return fmt.Sprintf("#%04d", id)
 }

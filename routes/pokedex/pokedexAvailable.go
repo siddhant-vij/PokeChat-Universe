@@ -6,7 +6,7 @@ import (
 	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
 )
 
-func ServePokedexPage(w http.ResponseWriter, r *http.Request) {
-	pokedexPage := pages.PokedexPage()
+func AvailablePokedexHandler(w http.ResponseWriter, r *http.Request) {
+	pokedexPage := pages.PokedexAvailable()
 	pokedexPage.Render(r.Context(), w)
 }

@@ -30,10 +30,10 @@ func ServeHomePage(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig
 		return
 	}
 
-	var homeAvailablePokemons = make([]utils.HomeAvailablePokemon, 0)
+	var homeAvailablePokemons = make([]utils.PokemonDisplay, 0)
 
 	for _, pokemon := range pokemonList {
-		homeAvailablePokemons = append(homeAvailablePokemons, utils.HomeAvailablePokemon{
+		homeAvailablePokemons = append(homeAvailablePokemons, utils.PokemonDisplay{
 			ID:         utils.FormatID(int(pokemon.ID)),
 			Name:       utils.FormatName(pokemon.Name),
 			PictureUrl: pokemon.PictureUrl,
@@ -49,7 +49,7 @@ func ServeHomePage(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig
 
 func HomeAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	sortCriteria := r.FormValue("sort-by")
-	var homeAvailablePokemons = make([]utils.HomeAvailablePokemon, 0)
+	var homeAvailablePokemons = make([]utils.PokemonDisplay, 0)
 	initialLimit := 12
 
 	switch sortCriteria {
@@ -67,7 +67,7 @@ func HomeAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.AppCo
 			return
 		}
 		for _, pokemon := range pokemonList {
-			homeAvailablePokemons = append(homeAvailablePokemons, utils.HomeAvailablePokemon{
+			homeAvailablePokemons = append(homeAvailablePokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
 				PictureUrl: pokemon.PictureUrl,
@@ -90,7 +90,7 @@ func HomeAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.AppCo
 			return
 		}
 		for _, pokemon := range pokemonList {
-			homeAvailablePokemons = append(homeAvailablePokemons, utils.HomeAvailablePokemon{
+			homeAvailablePokemons = append(homeAvailablePokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
 				PictureUrl: pokemon.PictureUrl,
@@ -113,7 +113,7 @@ func HomeAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.AppCo
 			return
 		}
 		for _, pokemon := range pokemonList {
-			homeAvailablePokemons = append(homeAvailablePokemons, utils.HomeAvailablePokemon{
+			homeAvailablePokemons = append(homeAvailablePokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
 				PictureUrl: pokemon.PictureUrl,
@@ -136,7 +136,7 @@ func HomeAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.AppCo
 			return
 		}
 		for _, pokemon := range pokemonList {
-			homeAvailablePokemons = append(homeAvailablePokemons, utils.HomeAvailablePokemon{
+			homeAvailablePokemons = append(homeAvailablePokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
 				PictureUrl: pokemon.PictureUrl,
@@ -158,7 +158,7 @@ func HomeAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.AppCo
 func HomeAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	sortCriteria := r.FormValue("sort-by")
 	loadMoreLimit := 12
-	var homeAvailablePokemons = make([]utils.HomeAvailablePokemon, 0)
+	var homeAvailablePokemons = make([]utils.PokemonDisplay, 0)
 
 	switch sortCriteria {
 	case "id-asc":
@@ -174,7 +174,7 @@ func HomeAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *config.A
 			return
 		}
 		for _, pokemon := range pokemonList {
-			homeAvailablePokemons = append(homeAvailablePokemons, utils.HomeAvailablePokemon{
+			homeAvailablePokemons = append(homeAvailablePokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
 				PictureUrl: pokemon.PictureUrl,
@@ -194,7 +194,7 @@ func HomeAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *config.A
 			return
 		}
 		for _, pokemon := range pokemonList {
-			homeAvailablePokemons = append(homeAvailablePokemons, utils.HomeAvailablePokemon{
+			homeAvailablePokemons = append(homeAvailablePokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
 				PictureUrl: pokemon.PictureUrl,
@@ -214,7 +214,7 @@ func HomeAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *config.A
 			return
 		}
 		for _, pokemon := range pokemonList {
-			homeAvailablePokemons = append(homeAvailablePokemons, utils.HomeAvailablePokemon{
+			homeAvailablePokemons = append(homeAvailablePokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
 				PictureUrl: pokemon.PictureUrl,
@@ -234,7 +234,7 @@ func HomeAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *config.A
 			return
 		}
 		for _, pokemon := range pokemonList {
-			homeAvailablePokemons = append(homeAvailablePokemons, utils.HomeAvailablePokemon{
+			homeAvailablePokemons = append(homeAvailablePokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
 				PictureUrl: pokemon.PictureUrl,
@@ -276,10 +276,10 @@ func HomeAvailableSearch(w http.ResponseWriter, r *http.Request, cfg *config.App
 		return
 	}
 
-	var homeSearchPokemons = make([]utils.HomeAvailablePokemon, 0)
+	var homeSearchPokemons = make([]utils.PokemonDisplay, 0)
 
 	for _, pokemon := range pokemonList {
-		homeSearchPokemons = append(homeSearchPokemons, utils.HomeAvailablePokemon{
+		homeSearchPokemons = append(homeSearchPokemons, utils.PokemonDisplay{
 			ID:         utils.FormatID(int(pokemon.ID)),
 			Name:       utils.FormatName(pokemon.Name),
 			PictureUrl: pokemon.PictureUrl,
