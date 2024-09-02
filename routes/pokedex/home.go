@@ -2,6 +2,7 @@ package pokedexroutes
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -79,4 +80,44 @@ func HomeAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *config.A
 		loadMoreBtnDisabled := pages.LoadMoreButtonDisabled()
 		loadMoreBtnDisabled.Render(r.Context(), w)
 	}
+}
+
+func HomeAvailableSearch(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
+	pokemonName := r.FormValue("pokemonName")
+	if pokemonName == "" {
+		w.Header().Set("HX-Redirect", "/")
+		return
+	}
+
+	params := pokedex.SearchPokemonByNameParams{
+		Name:  fmt.Sprintf("%s%%", pokemonName),
+		Limit: 12,
+	}
+
+	pokemonList, err := cfg.DBQueries.SearchPokemonByName(context.Background(), params)
+	if err != nil {
+		log.Fatalf("error getting the search pokemon list from DB - Home Available Tab. Err: %v", err)
+		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+		serverErrorPage.Render(r.Context(), w)
+		return
+	}
+
+	var homeSearchPokemons = make([]utils.HomeAvailablePokemon, 0)
+
+	for _, pokemon := range pokemonList {
+		homeSearchPokemons = append(homeSearchPokemons, utils.HomeAvailablePokemon{
+			ID:         utils.FormatID(int(pokemon.ID)),
+			Name:       utils.FormatName(pokemon.Name),
+			PictureUrl: pokemon.PictureUrl,
+			Types:      utils.DisplayTypes(pokemon.Types),
+		})
+	}
+
+	for _, pokemon := range homeSearchPokemons {
+		pokemonCard := pages.HomeAvailablePokemonCard(pokemon)
+		pokemonCard.Render(r.Context(), w)
+	}
+
+	loadMoreSearchBtnDisabled := pages.LoadMoreSearchButtonDisabled()
+	loadMoreSearchBtnDisabled.Render(r.Context(), w)
 }

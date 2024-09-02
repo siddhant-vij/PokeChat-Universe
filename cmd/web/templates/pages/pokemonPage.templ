@@ -19,7 +19,7 @@ templ PokemonPage(pokemon pokedex.Pokemon, authStatus, isCollected bool, evoluti
 			<title>PokeChat Universe</title>
 		</head>
 		<body class="bg-zinc-600 scroll-smooth">
-			<div class="flex flex-col w-[1024px] mx-auto min-h-screen">
+			<div class="flex flex-col w-[1024px] mx-auto min-h-screen bg-base-100">
 				@components.Header(true, authStatus)
 				@PokemonDetails(pokemon, isCollected, authStatus, evolutionChain)
 				<hr/>
@@ -31,7 +31,7 @@ templ PokemonPage(pokemon pokedex.Pokemon, authStatus, isCollected bool, evoluti
 
 templ PokemonDetails(pokemon pokedex.Pokemon, authStatus, isCollected bool, evolutionChain []pokedex.GetFullEvolutionChainRow) {
 	<main class="flex-grow">
-		<div class="p-8 bg-base-100 flex flex-col">
+		<div class="p-8 flex flex-col">
 			@PokemonHeader(utils.FormatID(int(pokemon.ID)), utils.FormatName(pokemon.Name))
 			@PokemonCard(pokemon.Name, pokemon.PictureUrl, utils.FormatHeight(pokemon.Height), utils.FormatWeight(pokemon.Weight), utils.FormatBaseExp(pokemon.BaseExperience), utils.DisplayTypes(pokemon.Types))
 			@PokemonStats(utils.GetStats(pokemon), utils.GetMaxStats())

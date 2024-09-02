@@ -74,6 +74,7 @@ func RegisterRoutes(mux *http.ServeMux) {
 	// Handlers for App Workflow - Pokedex
 	PokedexHandlers(mux)
 	LoadMoreHandlers(mux)
+	SearchAndSortHandlers(mux)
 }
 
 func HealthHandlers(mux *http.ServeMux) {
@@ -166,5 +167,11 @@ func PokedexHandlers(mux *http.ServeMux) {
 func LoadMoreHandlers(mux *http.ServeMux) {
 	mux.Handle("/home-load-more", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.HomeAvailableLoadMore(w, r, appConfig)
+	}))
+}
+
+func SearchAndSortHandlers(mux *http.ServeMux) {
+	mux.Handle("/home-search", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.HomeAvailableSearch(w, r, appConfig)
 	}))
 }

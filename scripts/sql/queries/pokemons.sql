@@ -45,6 +45,16 @@ WHERE id = $1;
 DELETE FROM pokemons
 WHERE id = $1;
 
+-- name: SearchPokemonByName :many
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+WHERE pokemons.name ILIKE $1
+LIMIT $2;
+
 -- name: GetPokemonsSortedByIdAsc :many
 SELECT
   pokemons.id,

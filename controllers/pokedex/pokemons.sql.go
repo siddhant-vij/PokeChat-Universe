@@ -356,6 +356,57 @@ func (q *Queries) InsertPokemon(ctx context.Context, arg InsertPokemonParams) er
 	return err
 }
 
+const searchPokemonByName = `-- name: SearchPokemonByName :many
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+WHERE pokemons.name ILIKE $1
+LIMIT $2
+`
+
+type SearchPokemonByNameParams struct {
+	Name  string
+	Limit int32
+}
+
+type SearchPokemonByNameRow struct {
+	ID         int32
+	Name       string
+	PictureUrl string
+	Types      []string
+}
+
+func (q *Queries) SearchPokemonByName(ctx context.Context, arg SearchPokemonByNameParams) ([]SearchPokemonByNameRow, error) {
+	rows, err := q.db.QueryContext(ctx, searchPokemonByName, arg.Name, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SearchPokemonByNameRow
+	for rows.Next() {
+		var i SearchPokemonByNameRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.PictureUrl,
+			pq.Array(&i.Types),
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updatePokemonByID = `-- name: UpdatePokemonByID :exec
 UPDATE pokemons
 SET
