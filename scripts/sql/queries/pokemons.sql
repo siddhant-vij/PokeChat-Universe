@@ -11,13 +11,6 @@ SELECT COUNT(*) FROM pokemons;
 SELECT * FROM pokemons
 WHERE name = $1 LIMIT 1;
 
--- name: GetOnePokemonAfterCollection :one
-SELECT id, name, picture_url
-FROM pokemons
-WHERE id > $1
-ORDER BY id ASC
-LIMIT 1;
-
 -- name: GetPokemonByID :one
 SELECT * FROM pokemons
 WHERE id = $1 LIMIT 1;
