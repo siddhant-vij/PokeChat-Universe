@@ -21,7 +21,7 @@ templ PokemonPage(pokemon pokedex.Pokemon, authStatus, isCollected bool, evoluti
 		<body class="bg-zinc-600 scroll-smooth">
 			<div class="flex flex-col w-[1024px] mx-auto min-h-screen bg-base-100">
 				@components.Header(true, authStatus)
-				@PokemonDetails(pokemon, isCollected, authStatus, evolutionChain)
+				@PokemonDetails(pokemon, authStatus, isCollected, evolutionChain)
 				<hr/>
 				@components.Footer()
 			</div>

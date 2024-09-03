@@ -16,8 +16,8 @@ templ Header(isErrorPage, authStatus bool) {
 									class="active"
 									hx-get="/available"
 									hx-trigger="click"
-									hx-target="#page-details"
-									hx-swap="outerHTML"
+									hx-target="#main"
+									hx-swap="innerHTML"
 								>
 									Available
 								</a>
@@ -27,8 +27,8 @@ templ Header(isErrorPage, authStatus bool) {
 									id="collected-tab"
 									hx-get="/collected"
 									hx-trigger="click"
-									hx-target="#page-details"
-									hx-swap="outerHTML"
+									hx-target="#main"
+									hx-swap="innerHTML"
 								>
 									Collected
 								</a>
@@ -38,8 +38,8 @@ templ Header(isErrorPage, authStatus bool) {
 									id="chat-tab"
 									hx-get="/chat"
 									hx-trigger="click"
-									hx-target="#page-details"
-									hx-swap="outerHTML"
+									hx-target="#main"
+									hx-swap="innerHTML"
 								>
 									Chat
 								</a>

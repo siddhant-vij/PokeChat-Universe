@@ -8,6 +8,7 @@ import (
 
 	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
 	"github.com/siddhant-vij/PokeChat-Universe/config"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
 )
 
 func GetPokemonHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,9 +37,21 @@ func ServePokemonPage(w http.ResponseWriter, r *http.Request, cfg *config.AppCon
 	}
 
 	if cfg.AuthStatus {
-		// check if the user has already collected the pokemon - isCollected? & then proceed here...
+		isCollectedParams := pokedex.IsPokemonCollectedParams{
+			UserID:    cfg.LoggedInUserId,
+			PokemonID: int32(pokemonId),
+		}
+		isCollected, err := cfg.DBQueries.IsPokemonCollected(context.Background(), isCollectedParams)
+		if err != nil {
+			log.Println(err)
+			serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+			serverErrorPage.Render(r.Context(), w)
+			return
+		}
+		pokemonPage := pages.PokemonPage(pokemon, cfg.AuthStatus, isCollected, evolutionChain)
+		pokemonPage.Render(r.Context(), w)
 	} else {
-		pokemonPage := pages.PokemonPage(pokemon, false, false, evolutionChain)
+		pokemonPage := pages.PokemonPage(pokemon, cfg.AuthStatus, false, evolutionChain)
 		pokemonPage.Render(r.Context(), w)
 	}
 }

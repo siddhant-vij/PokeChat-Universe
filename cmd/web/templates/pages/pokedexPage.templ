@@ -1,8 +1,12 @@
 package pages
 
-import "github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
+import (
+	"fmt"
+	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
+)
 
-templ PokedexPage() {
+templ PokedexPage(pokedexAvailable []utils.PokemonDisplay) {
 	<!DOCTYPE html>
 	<html>
 		<head>
@@ -16,7 +20,7 @@ templ PokedexPage() {
 		<body class="bg-zinc-600 scroll-smooth">
 			<div class="flex flex-col w-[1024px] mx-auto min-h-screen bg-base-100">
 				@components.Header(false, true)
-				@InitialPokedexAvailable()
+				@InitialPokedexAvailable(pokedexAvailable)
 				<hr/>
 				@components.Footer()
 			</div>
@@ -24,14 +28,187 @@ templ PokedexPage() {
 	</html>
 }
 
-templ InitialPokedexAvailable() {
-	<main class="flex-grow">
-		<div class="p-8 h-full flex justify-center">
-			<div class="text-center">
-				<div class="pt-48">
-					<h1 id="page-details" class="text-3xl font-bold">Resource Page - Available Tab</h1>
+templ InitialPokedexAvailable(pokedexAvailable []utils.PokemonDisplay) {
+	<main id="main" class="flex-grow">
+		@PASearchAndSort()
+		@PAListOfPokemons(pokedexAvailable)
+		@PAvailLoadMoreIdAscButton()
+	</main>
+}
+
+templ PASearchAndSort() {
+	<div class="p-8 flex flex-row justify-around align-middle">
+		<label class="input input-bordered flex items-center gap-4 w-80">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-4 w-4 opacity-70">
+				<path
+					fill-rule="evenodd"
+					d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+					clip-rule="evenodd"
+				></path>
+			</svg>
+			<input
+				type="search"
+				class="grow text-sm"
+				autofocus
+				placeholder="Enter Pokemon Name"
+				name="pokemonName"
+				hx-get="/pa-search"
+				hx-trigger="input changed delay:500ms"
+				hx-target="#pokedex-available"
+			/>
+		</label>
+		<form
+			hx-get="/pa-sort"
+			hx-trigger="change"
+			hx-target="#pokedex-available"
+		>
+			<select class="select select-bordered w-80" name="sort-by">
+				<option disabled selected class="text-sm">Sort Pokemon List By</option>
+				<option selected="selected" value="id-asc">Lowest ID - First</option>
+				<option value="id-desc">Highest ID - First</option>
+				<option value="name-asc">A - Z</option>
+				<option value="name-desc">Z - A</option>
+			</select>
+		</form>
+	</div>
+}
+
+templ PAListOfPokemons(pokedexAvailable []utils.PokemonDisplay) {
+	<div id="pokedex-available" class="p-8 grid grid-cols-3 justify-center justify-items-center content-center gap-y-8">
+		for _, pokemon := range pokedexAvailable {
+			@PokedexAvailablePokemonCard(pokemon)
+		}
+	</div>
+}
+
+templ PokedexAvailablePokemonCard(pokemon utils.PokemonDisplay) {
+	<div class="card bg-base-300 w-72 shadow-xl hover:scale-105">
+		<figure>
+			<img
+				src={ pokemon.PictureUrl }
+				alt={ pokemon.Name }
+				class="p-8 pb-0"
+			/>
+		</figure>
+		<div class="card-body">
+			<div class="flex flex-row justify-between">
+				<h3 class="text-base">{ pokemon.ID }</h3>
+				<div>
+					for _, pokemonType := range pokemon.Types {
+						<div class="badge badge-outline text-xs h-6 leading-6 pl-4 pr-4 ml-1">{ pokemonType }</div>
+					}
 				</div>
 			</div>
+			<h2 class="card-title text-2xl py-2 pb-4">{ pokemon.Name }</h2>
+			<div class="flex flex-row justify-between">
+				<button
+					class="btn btn-outline btn-primary"
+					hx-get="/getPokemon"
+					hx-trigger="click"
+					hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, utils.DeformatName(pokemon.Name)) }
+				>
+					View Details
+				</button>
+				<button class="btn btn-success">Collect</button>
+			</div>
 		</div>
-	</main>
+	</div>
+}
+
+templ PAvailLoadMoreIdAscButton() {
+	<div class="p-8 grid grid-cols-1 justify-center justify-items-center content-center gap-y-8">
+		<button
+			id="paLoadMoreBtn"
+			class="btn btn-active btn-primary"
+			hx-get="/pa-load-more"
+			hx-trigger="click"
+			hx-target="#pokedex-available"
+			hx-swap="beforeend"
+			hx-vals='{"sort-by": "id-asc"}'
+		>
+			Load more Pokemon
+		</button>
+	</div>
+}
+
+templ PALoadMoreIdAscButton() {
+	<button
+		id="paLoadMoreBtn"
+		class="btn btn-active btn-primary"
+		hx-get="/pa-load-more"
+		hx-trigger="click"
+		hx-target="#pokedex-available"
+		hx-swap="beforeend"
+		hx-vals='{"sort-by": "id-asc"}'
+		hx-swap-oob="outerHTML:#paLoadMoreBtn"
+	>
+		Load more Pokemon
+	</button>
+}
+
+templ PALoadMoreIdDescButton() {
+	<button
+		id="paLoadMoreBtn"
+		class="btn btn-active btn-primary"
+		hx-get="/pa-load-more"
+		hx-trigger="click"
+		hx-target="#pokedex-available"
+		hx-swap="beforeend"
+		hx-vals='{"sort-by": "id-desc"}'
+		hx-swap-oob="outerHTML:#paLoadMoreBtn"
+	>
+		Load more Pokemon
+	</button>
+}
+
+templ PALoadMoreNameAscButton() {
+	<button
+		id="paLoadMoreBtn"
+		class="btn btn-active btn-primary"
+		hx-get="/pa-load-more"
+		hx-trigger="click"
+		hx-target="#pokedex-available"
+		hx-swap="beforeend"
+		hx-vals='{"sort-by": "name-asc"}'
+		hx-swap-oob="outerHTML:#paLoadMoreBtn"
+	>
+		Load more Pokemon
+	</button>
+}
+
+templ PALoadMoreNameDescButton() {
+	<button
+		id="paLoadMoreBtn"
+		class="btn btn-active btn-primary"
+		hx-get="/pa-load-more"
+		hx-trigger="click"
+		hx-target="#pokedex-available"
+		hx-swap="beforeend"
+		hx-vals='{"sort-by": "name-desc"}'
+		hx-swap-oob="outerHTML:#paLoadMoreBtn"
+	>
+		Load more Pokemon
+	</button>
+}
+
+templ PALoadMoreButtonDisabled() {
+	<button
+		id="paLoadMoreBtn"
+		class="btn btn-outline btn-ghost tooltip tooltip-success cursor-default"
+		data-tip="No more Pokemon to load"
+		hx-swap-oob="outerHTML:#paLoadMoreBtn"
+	>
+		Load more Pokemon
+	</button>
+}
+
+templ PALoadMoreSearchButtonDisabled() {
+	<button
+		id="paLoadMoreBtn"
+		class="btn btn-outline btn-ghost tooltip tooltip-success cursor-default"
+		data-tip="Change search query"
+		hx-swap-oob="outerHTML:#paLoadMoreBtn"
+	>
+		Load more Pokemon
+	</button>
 }

@@ -147,7 +147,9 @@ func PageHandlers(mux *http.ServeMux) {
 		pokedexroutes.ServeHomePage(w, r, appConfig)
 	}))
 
-	mux.Handle("/pokedex", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ServePokedexPage), appConfig))
+	mux.Handle("/pokedex", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.ServePokedexPage(w, r, appConfig)
+	}), appConfig))
 
 	mux.HandleFunc("/getPokemon", pokedexroutes.GetPokemonHandler)
 
@@ -157,7 +159,9 @@ func PageHandlers(mux *http.ServeMux) {
 }
 
 func PokedexHandlers(mux *http.ServeMux) {
-	mux.Handle("/available", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.AvailablePokedexHandler), appConfig))
+	mux.Handle("/available", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.AvailablePokedexHandler(w, r, appConfig)
+	}), appConfig))
 
 	mux.Handle("/collected", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.CollectedPokedexHandler), appConfig))
 
@@ -168,6 +172,10 @@ func LoadMoreHandlers(mux *http.ServeMux) {
 	mux.Handle("/home-load-more", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.HomeAvailableLoadMore(w, r, appConfig)
 	}))
+
+	mux.Handle("/pa-load-more", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.PokedexAvailableLoadMore(w, r, appConfig)
+	}))
 }
 
 func SearchAndSortHandlers(mux *http.ServeMux) {
@@ -175,7 +183,15 @@ func SearchAndSortHandlers(mux *http.ServeMux) {
 		pokedexroutes.HomeAvailableSearch(w, r, appConfig)
 	}))
 
+	mux.Handle("/pa-search", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.PokedexAvailableSearch(w, r, appConfig)
+	}))
+
 	mux.Handle("/home-sort", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.HomeAvailableSort(w, r, appConfig)
+	}))
+
+	mux.Handle("/pa-sort", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.PokedexAvailableSort(w, r, appConfig)
 	}))
 }

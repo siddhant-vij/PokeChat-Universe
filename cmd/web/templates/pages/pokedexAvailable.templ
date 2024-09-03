@@ -1,5 +1,9 @@
 package pages
 
-templ PokedexAvailable() {
-	<h1 id="page-details" class="text-3xl font-bold">Resource Page - Available Tab</h1>
+import "github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
+
+templ PokedexAvailable(pokedexAvailable []utils.PokemonDisplay) {
+	@PASearchAndSort()
+	@PAListOfPokemons(pokedexAvailable)
+	@PAvailLoadMoreIdAscButton()
 }
