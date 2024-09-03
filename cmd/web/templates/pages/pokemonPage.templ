@@ -156,9 +156,15 @@ templ EvolutionCard(evolutionChain []pokedex.GetFullEvolutionChainRow) {
 
 templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 	<div class="flex flex-row justify-center gap-10">
-		<a href="/pokedex">
-			<button class="btn btn-outline btn-primary">Explore more Pokemon</button>
-		</a>
+		if isCollected {
+			<a href="/collectedPokedex">
+				<button class="btn btn-outline btn-primary">Explore more Pokemon</button>
+			</a>
+		} else {
+			<a href="/pokedex">
+				<button class="btn btn-outline btn-primary">Explore more Pokemon</button>
+			</a>
+		}
 		if authStatus {
 			if isCollected {
 				<button class="btn btn-success">Chat with { name }</button>
@@ -168,7 +174,7 @@ templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 					class="btn btn-success"
 					hx-post="/collectPokemon"
 					hx-trigger="click"
-					hx-target="this"
+					hx-target="closest div"
 					hx-swap="outerHTML"
 					hx-vals={ fmt.Sprintf(`{"pokemonIdStr": "%s", "pokemonName": "%s"}`, idStr, name) }
 				>
@@ -182,5 +188,10 @@ templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 }
 
 templ PokemonCollectedButton(name string) {
-	<button class="btn btn-success">Chat with { name }</button>
+	<div class="flex flex-row justify-center gap-10">
+		<a href="/collectedPokedex">
+			<button class="btn btn-outline btn-primary">Explore more Pokemon</button>
+		</a>
+		<button class="btn btn-success">Chat with { name }</button>
+	</div>
 }

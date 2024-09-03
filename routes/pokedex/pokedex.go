@@ -177,6 +177,11 @@ func PokedexAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.Ap
 		pokemonCard := pages.PokedexAvailablePokemonCard(pokemon, sortCriteria)
 		pokemonCard.Render(r.Context(), w)
 	}
+
+	if len(paPokemons) < initialLimit {
+		loadMoreBtnDisabled := pages.PALoadMoreButtonDisabled()
+		loadMoreBtnDisabled.Render(r.Context(), w)
+	}
 }
 
 func PokedexAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
