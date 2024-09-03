@@ -76,13 +76,13 @@ templ PASearchAndSort() {
 templ PAListOfPokemons(pokedexAvailable []utils.PokemonDisplay) {
 	<div id="pokedex-available" class="p-8 grid grid-cols-3 justify-center justify-items-center content-center gap-y-8">
 		for _, pokemon := range pokedexAvailable {
-			@PokedexAvailablePokemonCard(pokemon)
+			@PokedexAvailablePokemonCard(pokemon, "id-asc")
 		}
 	</div>
 }
 
-templ PokedexAvailablePokemonCard(pokemon utils.PokemonDisplay) {
-	<div class="card bg-base-300 w-72 shadow-xl hover:scale-105">
+templ PokedexAvailablePokemonCard(pokemon utils.PokemonDisplay, sortByState string) {
+	<div id="pokemon-card" class="card bg-base-300 w-72 shadow-xl hover:scale-105">
 		<figure>
 			<img
 				src={ pokemon.PictureUrl }
@@ -109,9 +109,26 @@ templ PokedexAvailablePokemonCard(pokemon utils.PokemonDisplay) {
 				>
 					View Details
 				</button>
-				<button class="btn btn-success">Collect</button>
+				<button
+					class="btn btn-success"
+					hx-delete="/collect"
+					hx-trigger="click"
+					hx-target="closest #pokemon-card"
+					hx-swap="delete"
+					hx-vals={ fmt.Sprintf(`{"pokemonIdStr": "%s", "sortBy": "%s"}`, pokemon.ID, sortByState) }
+				>
+					Collect
+				</button>
 			</div>
 		</div>
+	</div>
+}
+
+templ PokedexAvailableAfterCollection(pokemon utils.PokemonDisplay, sortByState string) {
+	<div
+		hx-swap-oob="beforeend:#pokedex-available"
+	>
+		@PokedexAvailablePokemonCard(pokemon, sortByState)
 	</div>
 }
 

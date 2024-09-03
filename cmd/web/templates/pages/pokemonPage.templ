@@ -36,7 +36,7 @@ templ PokemonDetails(pokemon pokedex.Pokemon, authStatus, isCollected bool, evol
 			@PokemonCard(pokemon.Name, pokemon.PictureUrl, utils.FormatHeight(pokemon.Height), utils.FormatWeight(pokemon.Weight), utils.FormatBaseExp(pokemon.BaseExperience), utils.DisplayTypes(pokemon.Types))
 			@PokemonStats(utils.GetStats(pokemon), utils.GetMaxStats())
 			@EvolutionCard(evolutionChain)
-			@PokemonFooter(utils.FormatName(pokemon.Name), authStatus, isCollected)
+			@PokemonFooter(utils.FormatID(int(pokemon.ID)), utils.FormatName(pokemon.Name), authStatus, isCollected)
 		</div>
 	</main>
 }
@@ -154,7 +154,7 @@ templ EvolutionCard(evolutionChain []pokedex.GetFullEvolutionChainRow) {
 	</div>
 }
 
-templ PokemonFooter(name string, authStatus, isCollected bool) {
+templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 	<div class="flex flex-row justify-center gap-10">
 		<a href="/pokedex">
 			<button class="btn btn-outline btn-primary">Explore more Pokemon</button>
@@ -163,10 +163,24 @@ templ PokemonFooter(name string, authStatus, isCollected bool) {
 			if isCollected {
 				<button class="btn btn-success">Chat with { name }</button>
 			} else {
-				<button class="btn btn-success">Collect { name }</button>
+				<button
+					id="collectBtn"
+					class="btn btn-success"
+					hx-post="/collectPokemon"
+					hx-trigger="click"
+					hx-target="this"
+					hx-swap="outerHTML"
+					hx-vals={ fmt.Sprintf(`{"pokemonIdStr": "%s", "pokemonName": "%s"}`, idStr, name) }
+				>
+					Collect { name }
+				</button>
 			}
 		} else {
 			<button class="btn btn-outline btn-ghost tooltip tooltip-success cursor-default" data-tip="Login to collect">Collect { name }</button>
 		}
 	</div>
+}
+
+templ PokemonCollectedButton(name string) {
+	<button class="btn btn-success">Chat with { name }</button>
 }

@@ -12,10 +12,14 @@ import (
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
 )
 
-var currentAvailableOffset int
+var (
+	currentAvailableOffset int
+	lastFetchedPokemon     map[string]string
+)
 
 func ServePokedexPage(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	currentAvailableOffset = 0
+	lastFetchedPokemon = make(map[string]string)
 	initialLimit := 12
 
 	params := pokedex.GetUserAvailablePokemonsSortedByIdAscParams{
@@ -33,7 +37,10 @@ func ServePokedexPage(w http.ResponseWriter, r *http.Request, cfg *config.AppCon
 
 	var paPokemons = make([]utils.PokemonDisplay, 0)
 
-	for _, pokemon := range pokemonList {
+	for id, pokemon := range pokemonList {
+		if id == len(pokemonList)-1 {
+			lastFetchedPokemon["id-asc"] = utils.FormatID(int(pokemon.ID))
+		}
 		paPokemons = append(paPokemons, utils.PokemonDisplay{
 			ID:         utils.FormatID(int(pokemon.ID)),
 			Name:       utils.FormatName(pokemon.Name),
@@ -68,7 +75,10 @@ func PokedexAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.Ap
 			serverErrorPage.Render(r.Context(), w)
 			return
 		}
-		for _, pokemon := range pokemonList {
+		for id, pokemon := range pokemonList {
+			if id == len(pokemonList)-1 {
+				lastFetchedPokemon["id-asc"] = utils.FormatID(int(pokemon.ID))
+			}
 			paPokemons = append(paPokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
@@ -92,7 +102,10 @@ func PokedexAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.Ap
 			serverErrorPage.Render(r.Context(), w)
 			return
 		}
-		for _, pokemon := range pokemonList {
+		for id, pokemon := range pokemonList {
+			if id == len(pokemonList)-1 {
+				lastFetchedPokemon["id-desc"] = utils.FormatID(int(pokemon.ID))
+			}
 			paPokemons = append(paPokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
@@ -116,7 +129,10 @@ func PokedexAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.Ap
 			serverErrorPage.Render(r.Context(), w)
 			return
 		}
-		for _, pokemon := range pokemonList {
+		for id, pokemon := range pokemonList {
+			if id == len(pokemonList)-1 {
+				lastFetchedPokemon["name-asc"] = utils.FormatName(pokemon.Name)
+			}
 			paPokemons = append(paPokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
@@ -140,7 +156,10 @@ func PokedexAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.Ap
 			serverErrorPage.Render(r.Context(), w)
 			return
 		}
-		for _, pokemon := range pokemonList {
+		for id, pokemon := range pokemonList {
+			if id == len(pokemonList)-1 {
+				lastFetchedPokemon["name-desc"] = utils.FormatName(pokemon.Name)
+			}
 			paPokemons = append(paPokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
@@ -155,7 +174,7 @@ func PokedexAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.Ap
 	currentAvailableOffset += initialLimit
 
 	for _, pokemon := range paPokemons {
-		pokemonCard := pages.PokedexAvailablePokemonCard(pokemon)
+		pokemonCard := pages.PokedexAvailablePokemonCard(pokemon, sortCriteria)
 		pokemonCard.Render(r.Context(), w)
 	}
 }
@@ -179,7 +198,10 @@ func PokedexAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *confi
 			serverErrorPage.Render(r.Context(), w)
 			return
 		}
-		for _, pokemon := range pokemonList {
+		for id, pokemon := range pokemonList {
+			if id == len(pokemonList)-1 {
+				lastFetchedPokemon["id-asc"] = utils.FormatID(int(pokemon.ID))
+			}
 			paPokemons = append(paPokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
@@ -200,7 +222,10 @@ func PokedexAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *confi
 			serverErrorPage.Render(r.Context(), w)
 			return
 		}
-		for _, pokemon := range pokemonList {
+		for id, pokemon := range pokemonList {
+			if id == len(pokemonList)-1 {
+				lastFetchedPokemon["id-desc"] = utils.FormatID(int(pokemon.ID))
+			}
 			paPokemons = append(paPokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
@@ -221,7 +246,10 @@ func PokedexAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *confi
 			serverErrorPage.Render(r.Context(), w)
 			return
 		}
-		for _, pokemon := range pokemonList {
+		for id, pokemon := range pokemonList {
+			if id == len(pokemonList)-1 {
+				lastFetchedPokemon["name-asc"] = utils.FormatName(pokemon.Name)
+			}
 			paPokemons = append(paPokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
@@ -242,7 +270,10 @@ func PokedexAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *confi
 			serverErrorPage.Render(r.Context(), w)
 			return
 		}
-		for _, pokemon := range pokemonList {
+		for id, pokemon := range pokemonList {
+			if id == len(pokemonList)-1 {
+				lastFetchedPokemon["name-desc"] = utils.FormatName(pokemon.Name)
+			}
 			paPokemons = append(paPokemons, utils.PokemonDisplay{
 				ID:         utils.FormatID(int(pokemon.ID)),
 				Name:       utils.FormatName(pokemon.Name),
@@ -255,7 +286,7 @@ func PokedexAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *confi
 	currentAvailableOffset += loadMoreLimit
 
 	for _, pokemon := range paPokemons {
-		pokemonCard := pages.PokedexAvailablePokemonCard(pokemon)
+		pokemonCard := pages.PokedexAvailablePokemonCard(pokemon, sortCriteria)
 		pokemonCard.Render(r.Context(), w)
 	}
 
@@ -288,7 +319,10 @@ func PokedexAvailableSearch(w http.ResponseWriter, r *http.Request, cfg *config.
 
 	var paSearchPokemons = make([]utils.PokemonDisplay, 0)
 
-	for _, pokemon := range pokemonList {
+	for id, pokemon := range pokemonList {
+		if id == len(pokemonList)-1 {
+			lastFetchedPokemon["name-asc"] = utils.FormatName(pokemon.Name)
+		}
 		paSearchPokemons = append(paSearchPokemons, utils.PokemonDisplay{
 			ID:         utils.FormatID(int(pokemon.ID)),
 			Name:       utils.FormatName(pokemon.Name),
@@ -298,7 +332,7 @@ func PokedexAvailableSearch(w http.ResponseWriter, r *http.Request, cfg *config.
 	}
 
 	for _, pokemon := range paSearchPokemons {
-		pokemonCard := pages.PokedexAvailablePokemonCard(pokemon)
+		pokemonCard := pages.PokedexAvailablePokemonCard(pokemon, "name-asc")
 		pokemonCard.Render(r.Context(), w)
 	}
 

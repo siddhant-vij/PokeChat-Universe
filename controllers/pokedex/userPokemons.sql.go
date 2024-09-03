@@ -12,7 +12,7 @@ import (
 	"github.com/lib/pq"
 )
 
-const getOneAvailablePokemonAfterCollection = `-- name: GetOneAvailablePokemonAfterCollection :one
+const getOneAvailablePokemonAfterCollectionByIdAsc = `-- name: GetOneAvailablePokemonAfterCollectionByIdAsc :one
 SELECT
   pokemons.id,
   pokemons.name,
@@ -28,21 +28,141 @@ ORDER BY pokemons.id ASC
 LIMIT 1
 `
 
-type GetOneAvailablePokemonAfterCollectionParams struct {
+type GetOneAvailablePokemonAfterCollectionByIdAscParams struct {
 	UserID uuid.UUID
 	ID     int32
 }
 
-type GetOneAvailablePokemonAfterCollectionRow struct {
+type GetOneAvailablePokemonAfterCollectionByIdAscRow struct {
 	ID         int32
 	Name       string
 	PictureUrl string
 	Types      []string
 }
 
-func (q *Queries) GetOneAvailablePokemonAfterCollection(ctx context.Context, arg GetOneAvailablePokemonAfterCollectionParams) (GetOneAvailablePokemonAfterCollectionRow, error) {
-	row := q.db.QueryRowContext(ctx, getOneAvailablePokemonAfterCollection, arg.UserID, arg.ID)
-	var i GetOneAvailablePokemonAfterCollectionRow
+func (q *Queries) GetOneAvailablePokemonAfterCollectionByIdAsc(ctx context.Context, arg GetOneAvailablePokemonAfterCollectionByIdAscParams) (GetOneAvailablePokemonAfterCollectionByIdAscRow, error) {
+	row := q.db.QueryRowContext(ctx, getOneAvailablePokemonAfterCollectionByIdAsc, arg.UserID, arg.ID)
+	var i GetOneAvailablePokemonAfterCollectionByIdAscRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.PictureUrl,
+		pq.Array(&i.Types),
+	)
+	return i, err
+}
+
+const getOneAvailablePokemonAfterCollectionByIdDesc = `-- name: GetOneAvailablePokemonAfterCollectionByIdDesc :one
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+LEFT JOIN user_pokemons
+ON user_pokemons.pokemon_id = pokemons.id
+AND user_pokemons.user_id = $1
+WHERE user_pokemons.id IS NULL
+AND pokemons.id < $2
+ORDER BY pokemons.id DESC
+LIMIT 1
+`
+
+type GetOneAvailablePokemonAfterCollectionByIdDescParams struct {
+	UserID uuid.UUID
+	ID     int32
+}
+
+type GetOneAvailablePokemonAfterCollectionByIdDescRow struct {
+	ID         int32
+	Name       string
+	PictureUrl string
+	Types      []string
+}
+
+func (q *Queries) GetOneAvailablePokemonAfterCollectionByIdDesc(ctx context.Context, arg GetOneAvailablePokemonAfterCollectionByIdDescParams) (GetOneAvailablePokemonAfterCollectionByIdDescRow, error) {
+	row := q.db.QueryRowContext(ctx, getOneAvailablePokemonAfterCollectionByIdDesc, arg.UserID, arg.ID)
+	var i GetOneAvailablePokemonAfterCollectionByIdDescRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.PictureUrl,
+		pq.Array(&i.Types),
+	)
+	return i, err
+}
+
+const getOneAvailablePokemonAfterCollectionByNameAsc = `-- name: GetOneAvailablePokemonAfterCollectionByNameAsc :one
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+LEFT JOIN user_pokemons
+ON user_pokemons.pokemon_id = pokemons.id
+AND user_pokemons.user_id = $1
+WHERE user_pokemons.id IS NULL
+AND pokemons.name > $2
+ORDER BY pokemons.name ASC
+LIMIT 1
+`
+
+type GetOneAvailablePokemonAfterCollectionByNameAscParams struct {
+	UserID uuid.UUID
+	Name   string
+}
+
+type GetOneAvailablePokemonAfterCollectionByNameAscRow struct {
+	ID         int32
+	Name       string
+	PictureUrl string
+	Types      []string
+}
+
+func (q *Queries) GetOneAvailablePokemonAfterCollectionByNameAsc(ctx context.Context, arg GetOneAvailablePokemonAfterCollectionByNameAscParams) (GetOneAvailablePokemonAfterCollectionByNameAscRow, error) {
+	row := q.db.QueryRowContext(ctx, getOneAvailablePokemonAfterCollectionByNameAsc, arg.UserID, arg.Name)
+	var i GetOneAvailablePokemonAfterCollectionByNameAscRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.PictureUrl,
+		pq.Array(&i.Types),
+	)
+	return i, err
+}
+
+const getOneAvailablePokemonAfterCollectionByNameDesc = `-- name: GetOneAvailablePokemonAfterCollectionByNameDesc :one
+SELECT
+  pokemons.id,
+  pokemons.name,
+  pokemons.picture_url,
+  pokemons.types
+FROM pokemons
+LEFT JOIN user_pokemons
+ON user_pokemons.pokemon_id = pokemons.id
+AND user_pokemons.user_id = $1
+WHERE user_pokemons.id IS NULL
+AND pokemons.name < $2
+ORDER BY pokemons.name DESC
+LIMIT 1
+`
+
+type GetOneAvailablePokemonAfterCollectionByNameDescParams struct {
+	UserID uuid.UUID
+	Name   string
+}
+
+type GetOneAvailablePokemonAfterCollectionByNameDescRow struct {
+	ID         int32
+	Name       string
+	PictureUrl string
+	Types      []string
+}
+
+func (q *Queries) GetOneAvailablePokemonAfterCollectionByNameDesc(ctx context.Context, arg GetOneAvailablePokemonAfterCollectionByNameDescParams) (GetOneAvailablePokemonAfterCollectionByNameDescRow, error) {
+	row := q.db.QueryRowContext(ctx, getOneAvailablePokemonAfterCollectionByNameDesc, arg.UserID, arg.Name)
+	var i GetOneAvailablePokemonAfterCollectionByNameDescRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
@@ -551,6 +671,7 @@ ON user_pokemons.pokemon_id = pokemons.id
 AND user_pokemons.user_id = $1
 WHERE user_pokemons.id IS NULL
 AND pokemons.name ILIKE $2
+ORDER BY pokemons.name ASC
 LIMIT $3
 `
 
@@ -606,6 +727,7 @@ INNER JOIN user_pokemons
 ON user_pokemons.pokemon_id = pokemons.id
 AND user_pokemons.user_id = $1
 WHERE pokemons.name ILIKE $2
+ORDER BY pokemons.name ASC
 LIMIT $3
 `
 

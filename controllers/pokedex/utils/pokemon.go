@@ -2,10 +2,19 @@ package utils
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
 )
+
+func DeformatId(formattedId string) (int, error) {
+	id, err := strconv.Atoi(strings.TrimPrefix(formattedId, "#"))
+	if err != nil {
+		return 0, fmt.Errorf("error parsing id from string: %w", err)
+	}
+	return id, nil
+}
 
 func DeformatName(name string) string {
 	words := strings.Split(name, " ")

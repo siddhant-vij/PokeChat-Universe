@@ -156,6 +156,14 @@ func PageHandlers(mux *http.ServeMux) {
 	mux.Handle("/{pokemonName}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.ServePokemonPage(w, r, appConfig)
 	}))
+
+	mux.HandleFunc("/collect", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.CollectPokemonHandler(w, r, appConfig)
+	}))
+
+	mux.HandleFunc("/collectPokemon", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.CollectPokemonHandlerOnPokemonPage(w, r, appConfig)
+	}))
 }
 
 func PokedexHandlers(mux *http.ServeMux) {
