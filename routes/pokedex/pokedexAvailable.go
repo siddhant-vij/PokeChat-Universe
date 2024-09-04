@@ -11,10 +11,6 @@ import (
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
 )
 
-func CollectedToAvailableRedirect(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("HX-Redirect", "/pokedex")
-}
-
 func AvailablePokedexHandler(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	currentAvailableOffset = 0
 	initialLimit := 12

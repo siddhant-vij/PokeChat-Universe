@@ -7,25 +7,21 @@ import (
 	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
 )
 
-func ChatToAvailableRedirect(w http.ResponseWriter, r *http.Request) {
+func AvailableRedirectHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("HX-Redirect", "/pokedex")
 }
 
-func AvailableToChatRedirect(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("HX-Redirect", "/pokeChat/")
-}
-
-func ChatToCollectedRedirect(w http.ResponseWriter, r *http.Request) {
+func CollectedRedirectHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("HX-Redirect", "/collectedPokedex")
 }
 
-func CollectedToChatRedirect(w http.ResponseWriter, r *http.Request) {
+func ChatRedirectHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("HX-Redirect", "/pokeChat/")
 }
 
 func ChatPokedexHandler(w http.ResponseWriter, r *http.Request) {
 	pokemonName := r.FormValue("pokemonName")
-	if pokemonName == "" || pokemonName == "*" {
+	if pokemonName == "" {
 		chatPage := pages.PokedexChat("")
 		chatPage.Render(r.Context(), w)
 		return

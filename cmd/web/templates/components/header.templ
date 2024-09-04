@@ -21,7 +21,7 @@ templ Header(isErrorPage, authStatus bool) {
 							<li>
 								<a
 									id="collected-tab"
-									hx-get="/availableToCollected"
+									hx-get="/collected"
 									hx-trigger="click"
 								>
 									Collected
@@ -30,7 +30,7 @@ templ Header(isErrorPage, authStatus bool) {
 							<li>
 								<a
 									id="chat-tab"
-									hx-get="/availableToChat"
+									hx-get="/chat"
 									hx-trigger="click"
 								>
 									Chat
@@ -80,7 +80,7 @@ templ CollectedHeader() {
 					<li>
 						<a
 							id="available-tab"
-							hx-get="/collectedToAvailable"
+							hx-get="/available"
 							hx-trigger="click"
 						>
 							Available
@@ -97,7 +97,7 @@ templ CollectedHeader() {
 					<li>
 						<a
 							id="chat-tab"
-							hx-get="/collectedToChat"
+							hx-get="/chat"
 							hx-trigger="click"
 						>
 							Chat
@@ -123,7 +123,7 @@ templ ChatHeader() {
 					<li>
 						<a
 							id="available-tab"
-							hx-get="/chatToAvailable"
+							hx-get="/available"
 							hx-trigger="click"
 						>
 							Available
@@ -132,7 +132,7 @@ templ ChatHeader() {
 					<li>
 						<a
 							id="collected-tab"
-							hx-get="/chatToCollected"
+							hx-get="/collected"
 							hx-trigger="click"
 						>
 							Collected

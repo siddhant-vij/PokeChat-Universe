@@ -168,34 +168,18 @@ func PageHandlers(mux *http.ServeMux) {
 	mux.Handle("/collectPokemon", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.CollectPokemonHandlerOnPokemonPage(w, r, appConfig)
 	}), appConfig))
-}
-
-func PokedexHandlers(mux *http.ServeMux) {
-	mux.Handle("/available", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		pokedexroutes.AvailablePokedexHandler(w, r, appConfig)
-	}), appConfig))
-
-	mux.Handle("/collected", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		pokedexroutes.CollectedPokedexHandler(w, r, appConfig)
-	}), appConfig))
-
-	mux.Handle("/availableToCollected", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.AvailableToCollectedRedirect), appConfig))
-
-	mux.Handle("/collectedToAvailable", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.CollectedToAvailableRedirect), appConfig))
-
-	mux.Handle("/availableToChat", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.AvailableToChatRedirect), appConfig))
-
-	mux.Handle("/collectedToChat", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.CollectedToChatRedirect), appConfig))
-
-	mux.Handle("/chatToAvailable", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatToAvailableRedirect), appConfig))
-
-	mux.Handle("/chatToCollected", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatToCollectedRedirect), appConfig))
 
 	mux.Handle("/pokeChat", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatPokedexHandler), appConfig))
 
 	mux.Handle("/pokeChat/", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatWithPokemonHandler), appConfig))
+}
 
-	mux.Handle("/pokeChat/{pokemonName}", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatWithPokemonHandler), appConfig))
+func PokedexHandlers(mux *http.ServeMux) {
+	mux.Handle("/available", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.AvailableRedirectHandler), appConfig))
+
+	mux.Handle("/collected", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.CollectedRedirectHandler), appConfig))
+
+	mux.Handle("/chat", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatRedirectHandler), appConfig))
 }
 
 func LoadMoreHandlers(mux *http.ServeMux) {
