@@ -161,13 +161,13 @@ func PageHandlers(mux *http.ServeMux) {
 		pokedexroutes.ServePokemonPage(w, r, appConfig)
 	}))
 
-	mux.HandleFunc("/collect", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/collect", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.CollectPokemonHandler(w, r, appConfig)
-	}))
+	}), appConfig))
 
-	mux.HandleFunc("/collectPokemon", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/collectPokemon", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.CollectPokemonHandlerOnPokemonPage(w, r, appConfig)
-	}))
+	}), appConfig))
 }
 
 func PokedexHandlers(mux *http.ServeMux) {
@@ -179,7 +179,23 @@ func PokedexHandlers(mux *http.ServeMux) {
 		pokedexroutes.CollectedPokedexHandler(w, r, appConfig)
 	}), appConfig))
 
-	mux.Handle("/chat", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatPokedexHandler), appConfig))
+	mux.Handle("/availableToCollected", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.AvailableToCollectedRedirect), appConfig))
+
+	mux.Handle("/collectedToAvailable", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.CollectedToAvailableRedirect), appConfig))
+
+	mux.Handle("/availableToChat", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.AvailableToChatRedirect), appConfig))
+
+	mux.Handle("/collectedToChat", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.CollectedToChatRedirect), appConfig))
+
+	mux.Handle("/chatToAvailable", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatToAvailableRedirect), appConfig))
+
+	mux.Handle("/chatToCollected", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatToCollectedRedirect), appConfig))
+
+	mux.Handle("/pokeChat", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatPokedexHandler), appConfig))
+
+	mux.Handle("/pokeChat/", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatWithPokemonHandler), appConfig))
+
+	mux.Handle("/pokeChat/{pokemonName}", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatWithPokemonHandler), appConfig))
 }
 
 func LoadMoreHandlers(mux *http.ServeMux) {
@@ -187,13 +203,13 @@ func LoadMoreHandlers(mux *http.ServeMux) {
 		pokedexroutes.HomeAvailableLoadMore(w, r, appConfig)
 	}))
 
-	mux.Handle("/pa-load-more", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/pa-load-more", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.PokedexAvailableLoadMore(w, r, appConfig)
-	}))
+	}), appConfig))
 
-	mux.Handle("/pc-load-more", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/pc-load-more", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.PokedexCollectedLoadMore(w, r, appConfig)
-	}))
+	}), appConfig))
 }
 
 func SearchAndSortHandlers(mux *http.ServeMux) {
@@ -201,23 +217,23 @@ func SearchAndSortHandlers(mux *http.ServeMux) {
 		pokedexroutes.HomeAvailableSearch(w, r, appConfig)
 	}))
 
-	mux.Handle("/pa-search", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/pa-search", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.PokedexAvailableSearch(w, r, appConfig)
-	}))
+	}), appConfig))
 
-	mux.Handle("/pc-search", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/pc-search", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.PokedexCollectedSearch(w, r, appConfig)
-	}))
+	}), appConfig))
 
 	mux.Handle("/home-sort", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.HomeAvailableSort(w, r, appConfig)
 	}))
 
-	mux.Handle("/pa-sort", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/pa-sort", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.PokedexAvailableSort(w, r, appConfig)
-	}))
+	}), appConfig))
 
-	mux.Handle("/pc-sort", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/pc-sort", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.PokedexCollectedSort(w, r, appConfig)
-	}))
+	}), appConfig))
 }

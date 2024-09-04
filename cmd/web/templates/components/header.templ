@@ -14,10 +14,6 @@ templ Header(isErrorPage, authStatus bool) {
 								<a
 									id="available-tab"
 									class="active"
-									hx-get="/available"
-									hx-trigger="click"
-									hx-target="#main"
-									hx-swap="innerHTML"
 								>
 									Available
 								</a>
@@ -25,10 +21,8 @@ templ Header(isErrorPage, authStatus bool) {
 							<li>
 								<a
 									id="collected-tab"
-									hx-get="/collected"
+									hx-get="/availableToCollected"
 									hx-trigger="click"
-									hx-target="#main"
-									hx-swap="innerHTML"
 								>
 									Collected
 								</a>
@@ -36,10 +30,8 @@ templ Header(isErrorPage, authStatus bool) {
 							<li>
 								<a
 									id="chat-tab"
-									hx-get="/chat"
+									hx-get="/availableToChat"
 									hx-trigger="click"
-									hx-target="#main"
-									hx-swap="innerHTML"
 								>
 									Chat
 								</a>
@@ -88,10 +80,8 @@ templ CollectedHeader() {
 					<li>
 						<a
 							id="available-tab"
-							hx-get="/available"
+							hx-get="/collectedToAvailable"
 							hx-trigger="click"
-							hx-target="#main"
-							hx-swap="innerHTML"
 						>
 							Available
 						</a>
@@ -100,10 +90,6 @@ templ CollectedHeader() {
 						<a
 							id="collected-tab"
 							class="active"
-							hx-get="/collected"
-							hx-trigger="click"
-							hx-target="#main"
-							hx-swap="innerHTML"
 						>
 							Collected
 						</a>
@@ -111,10 +97,51 @@ templ CollectedHeader() {
 					<li>
 						<a
 							id="chat-tab"
-							hx-get="/chat"
+							hx-get="/collectedToChat"
 							hx-trigger="click"
-							hx-target="#main"
-							hx-swap="innerHTML"
+						>
+							Chat
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="navbar-end">
+				<a href="/logout" class="btn btn-primary">Logout</a>
+			</div>
+		</div>
+	</header>
+}
+
+templ ChatHeader() {
+	<header class="px-8 z-10 sticky top-0 bg-base-100">
+		<div class="navbar">
+			<div class="navbar-start">
+				<a href="/pokedex" class="btn btn-ghost text-xl">PokeChat</a>
+			</div>
+			<div class="navbar-center">
+				<ul class="menu menu-horizontal">
+					<li>
+						<a
+							id="available-tab"
+							hx-get="/chatToAvailable"
+							hx-trigger="click"
+						>
+							Available
+						</a>
+					</li>
+					<li>
+						<a
+							id="collected-tab"
+							hx-get="/chatToCollected"
+							hx-trigger="click"
+						>
+							Collected
+						</a>
+					</li>
+					<li>
+						<a
+							id="chat-tab"
+							class="active"
 						>
 							Chat
 						</a>

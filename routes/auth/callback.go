@@ -71,6 +71,7 @@ func ServeCallbackPage(w http.ResponseWriter, r *http.Request, authenticator *au
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session_id",
 		Value:    userSession.SessionId,
+		Path:     "/",
 		MaxAge:   86400,
 		Secure:   false,
 		HttpOnly: true,

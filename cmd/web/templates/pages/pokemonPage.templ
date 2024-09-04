@@ -15,7 +15,6 @@ templ PokemonPage(pokemon pokedex.Pokemon, authStatus, isCollected bool, evoluti
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link href="/cmd/web/public/css/output.css" rel="stylesheet"/>
 			<script src="/cmd/web/public/js/htmx.min.js" defer></script>
-			<script src="/cmd/web/public/js/activeTab.js" defer></script>
 			<title>PokeChat Universe</title>
 		</head>
 		<body class="bg-zinc-600 scroll-smooth">
@@ -167,7 +166,14 @@ templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 		}
 		if authStatus {
 			if isCollected {
-				<button class="btn btn-success">Chat with { name }</button>
+				<button
+					class="btn btn-success"
+					hx-get="/pokeChat"
+					hx-trigger="click"
+					hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, name) }
+				>
+					Chat with { name }
+				</button>
 			} else {
 				<button
 					id="collectBtn"
@@ -192,6 +198,13 @@ templ PokemonCollectedButton(name string) {
 		<a href="/collectedPokedex">
 			<button class="btn btn-outline btn-primary">Explore more Pokemon</button>
 		</a>
-		<button class="btn btn-success">Chat with { name }</button>
+		<button
+			class="btn btn-success"
+			hx-get="/pokeChat"
+			hx-trigger="click"
+			hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, name) }
+		>
+			Chat with { name }
+		</button>
 	</div>
 }

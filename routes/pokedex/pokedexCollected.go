@@ -14,6 +14,10 @@ import (
 
 var currentCollectedOffset int
 
+func AvailableToCollectedRedirect(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("HX-Redirect", "/collectedPokedex")
+}
+
 func ServeCollectedPage(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	currentCollectedOffset = 0
 	initialLimit := 12

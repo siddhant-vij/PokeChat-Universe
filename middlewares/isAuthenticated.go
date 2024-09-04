@@ -36,6 +36,7 @@ func IsAuthenticated(next http.Handler, cfg *config.AppConfig) http.Handler {
 		http.SetCookie(w, &http.Cookie{
 			Name:     "session_id",
 			Value:    sessionId,
+			Path:     "/",
 			Secure:   false,
 			HttpOnly: true,
 			MaxAge:   int(time.Until(cfg.AccessTokenIssuedAt.Add(24 * time.Hour)).Seconds()),
