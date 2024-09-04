@@ -4,7 +4,7 @@ A full-stack web application built using the GoTTH stack (Golang, Templ, Tailwin
 
 - Why? I mean why not?
 
-Leveraging a local instance of the Llama3 model via Ollama, the app provides real-time chat features powered by WebSockets and SSE for a seamless experience.
+Leveraging a local instance of the Llama3 model via Ollama, the app provides real-time chat features powered by SSE (Server-Sent Events) for a seamless experience.
 
 The web app also includes OAuth2/OIDC-based login via Auth0, dynamic frontend features (search, sort, pagination), and a fully scalable backend with persistent chat histories stored in PostgreSQL. Designed with performance and scalability in mind, the app is capable of handling high volumes of concurrent users while maintaining a smooth, responsive interface.
 
@@ -36,13 +36,11 @@ The web app also includes OAuth2/OIDC-based login via Auth0, dynamic frontend fe
 ## Technical Scope
 
 - **Frontend**: TailwindCSS for styling, HTMX for dynamic interactions, and Templ for rendering.
-- **Backend**: Golang-based API, handling user sessions, chat logic, and serving data via REST and WebSockets.
+- **Backend**: Golang-based API, handling user sessions, chat logic, and serving data via REST.
 - **Database**: PostgreSQL for relational data (users, Pokémon, chat histories) with Redis for session storage.
 - **Authentication**: OAuth2/OIDC-based login with Auth0.
 - **AI Integration**: Local Llama3 instance running via Ollama for generating contextual responses in real-time.
-- **Real-Time Communication**
-  - **WebSockets**: For handling live chats and managing open connections.
-  - **SSE (Server-Sent Events)**: For streaming AI responses to the frontend.
+- **Real-Time Communication**: Server-Sent Events for streaming AI responses to the frontend.
 
 <br>
 
