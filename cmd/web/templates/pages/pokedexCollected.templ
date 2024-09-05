@@ -14,11 +14,12 @@ templ PokedexCollectedPage(pokedexCollected []utils.PokemonDisplay) {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link href="/cmd/web/public/css/output.css" rel="stylesheet"/>
 			<script src="/cmd/web/public/js/htmx.min.js" defer></script>
+			<script src="/cmd/web/public/js/activeTab.js" defer></script>
 			<title>PokeChat Universe</title>
 		</head>
 		<body class="bg-zinc-600 scroll-smooth">
 			<div class="flex flex-col w-[1024px] mx-auto min-h-screen bg-base-100">
-				@components.CollectedHeader()
+				@components.Header(false, true, "collected")
 				<main id="main" class="flex-grow">
 					@PokedexCollected(pokedexCollected)
 				</main>
@@ -52,10 +53,29 @@ templ PCSearchAndSort() {
 				placeholder="Enter Pokemon Name"
 				name="pokemonName"
 				hx-get="/pc-search"
-				hx-trigger="input changed delay:500ms"
+				hx-trigger="input changed delay:500ms, search"
 				hx-target="#pokedex-collected"
 			/>
 		</label>
+		<form
+			id="sortForm"
+			hx-get="/pc-sort"
+			hx-trigger="change"
+			hx-target="#pokedex-collected"
+		>
+			<select class="select select-bordered w-80" name="sort-by">
+				<option disabled selected class="text-sm">Sort Pokemon List By</option>
+				<option selected="selected" value="id-asc">Lowest ID - First</option>
+				<option value="id-desc">Highest ID - First</option>
+				<option value="name-asc">A - Z</option>
+				<option value="name-desc">Z - A</option>
+			</select>
+		</form>
+	</div>
+}
+
+templ PCSortUpdateOOB() {
+	<div hx-swap-oob="innerHTML:#sortForm">
 		<form
 			hx-get="/pc-sort"
 			hx-trigger="change"

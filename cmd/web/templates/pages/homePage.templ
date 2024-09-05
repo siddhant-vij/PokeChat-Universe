@@ -18,7 +18,7 @@ templ HomePage(homeAvailable []utils.PokemonDisplay) {
 		</head>
 		<body class="bg-zinc-600 scroll-smooth">
 			<div class="flex flex-col w-[1024px] mx-auto min-h-screen bg-base-100">
-				@components.Header(false, false)
+				@components.Header(false, false, "available")
 				@HomeDetails(homeAvailable)
 				<hr/>
 				@components.Footer()
@@ -28,7 +28,7 @@ templ HomePage(homeAvailable []utils.PokemonDisplay) {
 }
 
 templ HomeDetails(homeAvailable []utils.PokemonDisplay) {
-	<main class="flex-grow">
+	<main id="main" class="flex-grow">
 		@SearchAndSort()
 		@ListOfPokemons(homeAvailable)
 		@HomeLoadMoreIdAscButton()

@@ -10,11 +10,12 @@ templ PokedexChatPage(pokemonName string) {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link href="/cmd/web/public/css/output.css" rel="stylesheet"/>
 			<script src="/cmd/web/public/js/htmx.min.js" defer></script>
+			<script src="/cmd/web/public/js/activeTab.js" defer></script>
 			<title>PokeChat Universe</title>
 		</head>
 		<body class="bg-zinc-600 scroll-smooth">
 			<div class="flex flex-col w-[1024px] mx-auto min-h-screen bg-base-100">
-				@components.ChatHeader()
+				@components.Header(false, true, "chat")
 				<main id="main" class="flex-grow">
 					@PokedexChat(pokemonName)
 				</main>

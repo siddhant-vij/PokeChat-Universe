@@ -14,7 +14,7 @@ templ ServerErrorPage(authStatus bool) {
 		</head>
 		<body class="bg-zinc-600 scroll-smooth">
 			<div class="flex flex-col w-[1024px] mx-auto h-screen">
-				@components.Header(true, authStatus)
+				@components.Header(true, authStatus, "error")
 				@ServerError()
 				<hr/>
 				@components.Footer()
@@ -30,7 +30,7 @@ templ ServerError() {
 				<div class="pt-48">
 					<h1 class="text-3xl font-bold">Something went wrong :(</h1>
 					<p class="py-6">
-						We are currently working on it. Please <a href="/" class="link link-primary">go back</a> and try again later.
+						We are currently working on it. Please <a href="/pokedex" class="link link-primary">go back</a> and try again later.
 					</p>
 				</div>
 			</div>

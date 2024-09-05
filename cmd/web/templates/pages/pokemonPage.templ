@@ -19,7 +19,7 @@ templ PokemonPage(pokemon pokedex.Pokemon, authStatus, isCollected bool, evoluti
 		</head>
 		<body class="bg-zinc-600 scroll-smooth">
 			<div class="flex flex-col w-[1024px] mx-auto min-h-screen bg-base-100">
-				@components.Header(true, authStatus)
+				@components.Header(true, authStatus, "pokemon")
 				@PokemonDetails(pokemon, authStatus, isCollected, evolutionChain)
 				<hr/>
 				@components.Footer()
@@ -29,7 +29,7 @@ templ PokemonPage(pokemon pokedex.Pokemon, authStatus, isCollected bool, evoluti
 }
 
 templ PokemonDetails(pokemon pokedex.Pokemon, authStatus, isCollected bool, evolutionChain []pokedex.GetFullEvolutionChainRow) {
-	<main class="flex-grow">
+	<main id="main" class="flex-grow">
 		<div class="p-8 flex flex-col">
 			@PokemonHeader(utils.FormatID(int(pokemon.ID)), utils.FormatName(pokemon.Name))
 			@PokemonCard(pokemon.Name, pokemon.PictureUrl, utils.FormatHeight(pokemon.Height), utils.FormatWeight(pokemon.Weight), utils.FormatBaseExp(pokemon.BaseExperience), utils.DisplayTypes(pokemon.Types))
@@ -155,15 +155,13 @@ templ EvolutionCard(evolutionChain []pokedex.GetFullEvolutionChainRow) {
 
 templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 	<div class="flex flex-row justify-center gap-10">
-		if isCollected {
-			<a href="/collectedPokedex">
-				<button class="btn btn-outline btn-primary">Explore more Pokemon</button>
-			</a>
-		} else {
-			<a href="/pokedex">
-				<button class="btn btn-outline btn-primary">Explore more Pokemon</button>
-			</a>
-		}
+		<button
+			class="btn btn-outline btn-primary"
+			hx-get="/pokedex"
+			hx-trigger="click"
+		>
+			Explore more Pokemon
+		</button>
 		if authStatus {
 			if isCollected {
 				<button
@@ -195,9 +193,13 @@ templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 
 templ PokemonCollectedButton(name string) {
 	<div class="flex flex-row justify-center gap-10">
-		<a href="/collectedPokedex">
-			<button class="btn btn-outline btn-primary">Explore more Pokemon</button>
-		</a>
+		<button
+			class="btn btn-outline btn-primary"
+			hx-get="/pokedex"
+			hx-trigger="click"
+		>
+			Explore more Pokemon
+		</button>
 		<button
 			class="btn btn-success"
 			hx-get="/pokeChat"

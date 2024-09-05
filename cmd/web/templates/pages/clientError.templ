@@ -14,7 +14,7 @@ templ ClientErrorPage(authStatus bool) {
 		</head>
 		<body class="bg-zinc-600 scroll-smooth">
 			<div class="flex flex-col w-[1024px] mx-auto h-screen">
-				@components.Header(true, authStatus)
+				@components.Header(true, authStatus, "error")
 				@ClientError()
 				<hr/>
 				@components.Footer()
@@ -30,7 +30,7 @@ templ ClientError() {
 				<div class="pt-48">
 					<h1 class="text-3xl font-bold">Sorry, this page isn't available.</h1>
 					<p class="py-6">
-						The link you followed may be broken, or the page may have been removed. <a href="/" class="link link-primary">Go back to Home</a>
+						The link you followed may be broken, or the page may have been removed. <a href="/pokedex" class="link link-primary">Go back to Home</a>
 					</p>
 				</div>
 			</div>

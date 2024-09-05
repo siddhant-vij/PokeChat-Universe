@@ -15,36 +15,41 @@ import (
 var currentOffset int
 
 func ServeHomePage(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
-	currentOffset = 0
-	initialLimit := 12
+	isHtmxRequest := r.Header.Get("HX-Request") == "true"
+	if isHtmxRequest {
+		w.Header().Set("HX-Redirect", "/")
+	} else {
+		currentOffset = 0
+		initialLimit := 12
 
-	params := pokedex.GetPokemonsSortedByIdAscParams{
-		Limit:  int32(initialLimit),
-		Offset: int32(currentOffset),
+		params := pokedex.GetPokemonsSortedByIdAscParams{
+			Limit:  int32(initialLimit),
+			Offset: int32(currentOffset),
+		}
+		pokemonList, err := cfg.DBQueries.GetPokemonsSortedByIdAsc(context.Background(), params)
+		if err != nil {
+			log.Fatalf("error getting the initial pokemon list from DB - Home Available Tab. Err: %v", err)
+			serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+			serverErrorPage.Render(r.Context(), w)
+			return
+		}
+
+		var homeAvailablePokemons = make([]utils.PokemonDisplay, 0)
+
+		for _, pokemon := range pokemonList {
+			homeAvailablePokemons = append(homeAvailablePokemons, utils.PokemonDisplay{
+				ID:         utils.FormatID(int(pokemon.ID)),
+				Name:       utils.FormatName(pokemon.Name),
+				PictureUrl: pokemon.PictureUrl,
+				Types:      utils.DisplayTypes(pokemon.Types),
+			})
+		}
+
+		currentOffset += initialLimit
+
+		homePage := pages.HomePage(homeAvailablePokemons)
+		homePage.Render(r.Context(), w)
 	}
-	pokemonList, err := cfg.DBQueries.GetPokemonsSortedByIdAsc(context.Background(), params)
-	if err != nil {
-		log.Fatalf("error getting the initial pokemon list from DB - Home Available Tab. Err: %v", err)
-		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
-		serverErrorPage.Render(r.Context(), w)
-		return
-	}
-
-	var homeAvailablePokemons = make([]utils.PokemonDisplay, 0)
-
-	for _, pokemon := range pokemonList {
-		homeAvailablePokemons = append(homeAvailablePokemons, utils.PokemonDisplay{
-			ID:         utils.FormatID(int(pokemon.ID)),
-			Name:       utils.FormatName(pokemon.Name),
-			PictureUrl: pokemon.PictureUrl,
-			Types:      utils.DisplayTypes(pokemon.Types),
-		})
-	}
-
-	currentOffset += initialLimit
-
-	homePage := pages.HomePage(homeAvailablePokemons)
-	homePage.Render(r.Context(), w)
 }
 
 func HomeAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
