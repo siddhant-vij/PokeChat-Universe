@@ -1,8 +1,7 @@
-document.addEventListener("DOMContentLoaded", function () {
+function activeTab() {
   const tabs = document.querySelectorAll(
     "#available-tab, #collected-tab, #chat-tab"
   );
-
   tabs.forEach((tab) => {
     if (tab.dataset.disabled === "true") {
       tab.addEventListener("click", function (event) {
@@ -18,4 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
   });
-});
+}
+
+document.addEventListener("DOMContentLoaded", activeTab);
+document.addEventListener("htmx:afterRequest", activeTab);

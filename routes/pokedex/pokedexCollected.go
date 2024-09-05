@@ -159,6 +159,9 @@ func PokedexCollectedSort(w http.ResponseWriter, r *http.Request, cfg *config.Ap
 		pokemonCard.Render(r.Context(), w)
 	}
 
+	searchUpdate := pages.PCSearchUpdateOOB()
+	searchUpdate.Render(r.Context(), w)
+
 	if len(pcPokemons) < initialLimit {
 		loadMoreBtnDisabled := pages.PCLoadMoreButtonDisabled()
 		loadMoreBtnDisabled.Render(r.Context(), w)
@@ -275,7 +278,7 @@ func PokedexCollectedSearch(w http.ResponseWriter, r *http.Request, cfg *config.
 	if pokemonName == "" {
 		r.Form.Add("sort-by", "id-asc")
 		PokedexCollectedSort(w, r, cfg)
-		sortUpdate:= pages.PCSortUpdateOOB()
+		sortUpdate := pages.PCSortUpdateSelectedOOB()
 		sortUpdate.Render(r.Context(), w)
 		return
 	}
@@ -312,6 +315,9 @@ func PokedexCollectedSearch(w http.ResponseWriter, r *http.Request, cfg *config.
 		pokemonCard := pages.PokedexCollectedPokemonCard(pokemon, "name-asc")
 		pokemonCard.Render(r.Context(), w)
 	}
+
+	sortUpdate := pages.PCSortUpdateOOB()
+	sortUpdate.Render(r.Context(), w)
 
 	loadMoreSearchBtnDisabled := pages.PCLoadMoreSearchButtonDisabled()
 	loadMoreSearchBtnDisabled.Render(r.Context(), w)

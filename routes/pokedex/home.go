@@ -158,6 +158,14 @@ func HomeAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.AppCo
 		pokemonCard := pages.HomeAvailablePokemonCard(pokemon)
 		pokemonCard.Render(r.Context(), w)
 	}
+
+	searchUpdate := pages.HomeSearchUpdateOOB()
+	searchUpdate.Render(r.Context(), w)
+
+	if len(homeAvailablePokemons) < initialLimit {
+		loadMoreBtnDisabled := pages.LoadMoreButtonDisabled()
+		loadMoreBtnDisabled.Render(r.Context(), w)
+	}
 }
 
 func HomeAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
@@ -264,7 +272,10 @@ func HomeAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *config.A
 func HomeAvailableSearch(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	pokemonName := r.FormValue("pokemonName")
 	if pokemonName == "" {
-		w.Header().Set("HX-Redirect", "/pokedex")
+		r.Form.Add("sort-by", "id-asc")
+		HomeAvailableSort(w, r, cfg)
+		sortUpdate := pages.HomeSortUpdateSelectedOOB()
+		sortUpdate.Render(r.Context(), w)
 		return
 	}
 
@@ -296,6 +307,9 @@ func HomeAvailableSearch(w http.ResponseWriter, r *http.Request, cfg *config.App
 		pokemonCard := pages.HomeAvailablePokemonCard(pokemon)
 		pokemonCard.Render(r.Context(), w)
 	}
+
+	sortUpdate := pages.HomeSortUpdateOOB()
+	sortUpdate.Render(r.Context(), w)
 
 	loadMoreSearchBtnDisabled := pages.LoadMoreSearchButtonDisabled()
 	loadMoreSearchBtnDisabled.Render(r.Context(), w)

@@ -173,6 +173,9 @@ func PokedexAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.Ap
 		pokemonCard.Render(r.Context(), w)
 	}
 
+	searchUpdate := pages.PASearchUpdateOOB()
+	searchUpdate.Render(r.Context(), w)
+
 	if len(paPokemons) < initialLimit {
 		loadMoreBtnDisabled := pages.PALoadMoreButtonDisabled()
 		loadMoreBtnDisabled.Render(r.Context(), w)
@@ -299,7 +302,10 @@ func PokedexAvailableLoadMore(w http.ResponseWriter, r *http.Request, cfg *confi
 func PokedexAvailableSearch(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	pokemonName := r.FormValue("pokemonName")
 	if pokemonName == "" {
-		w.Header().Set("HX-Redirect", "/pokedex")
+		r.Form.Add("sort-by", "id-asc")
+		PokedexAvailableSort(w, r, cfg)
+		sortUpdate := pages.PASortUpdateSelectedOOB()
+		sortUpdate.Render(r.Context(), w)
 		return
 	}
 
@@ -335,6 +341,9 @@ func PokedexAvailableSearch(w http.ResponseWriter, r *http.Request, cfg *config.
 		pokemonCard := pages.PokedexAvailablePokemonCard(pokemon, "name-asc")
 		pokemonCard.Render(r.Context(), w)
 	}
+
+	sortUpdate := pages.PASortUpdateOOB()
+	sortUpdate.Render(r.Context(), w)
 
 	loadMoreSearchBtnDisabled := pages.PALoadMoreSearchButtonDisabled()
 	loadMoreSearchBtnDisabled.Render(r.Context(), w)

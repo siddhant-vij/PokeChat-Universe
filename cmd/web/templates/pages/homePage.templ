@@ -16,7 +16,7 @@ templ HomePage(homeAvailable []utils.PokemonDisplay) {
 			<script src="/cmd/web/public/js/htmx.min.js" defer></script>
 			<title>PokeChat Universe</title>
 		</head>
-		<body class="bg-zinc-600 scroll-smooth">
+		<body class="bg-zinc-600 scroll-smooth overflow-y-scroll">
 			<div class="flex flex-col w-[1024px] mx-auto min-h-screen bg-base-100">
 				@components.Header(false, false, "available")
 				@HomeDetails(homeAvailable)
@@ -37,7 +37,7 @@ templ HomeDetails(homeAvailable []utils.PokemonDisplay) {
 
 templ SearchAndSort() {
 	<div class="p-8 flex flex-row justify-around align-middle">
-		<label class="input input-bordered flex items-center gap-4 w-80">
+		<label id="searchInput" class="input input-bordered flex items-center gap-4 w-80">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-4 w-4 opacity-70">
 				<path
 					fill-rule="evenodd"
@@ -57,6 +57,7 @@ templ SearchAndSort() {
 			/>
 		</label>
 		<form
+			id="sortForm"
 			hx-get="/home-sort"
 			hx-trigger="change"
 			hx-target="#home-available"
@@ -69,6 +70,52 @@ templ SearchAndSort() {
 				<option value="name-desc">Z - A</option>
 			</select>
 		</form>
+	</div>
+}
+
+templ HomeSearchUpdateOOB() {
+	<div hx-swap-oob="innerHTML:#searchInput">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-4 w-4 opacity-70">
+			<path
+				fill-rule="evenodd"
+				d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+		<input
+			type="search"
+			class="grow text-sm"
+			autofocus
+			placeholder="Enter Pokemon Name"
+			name="pokemonName"
+			hx-get="/home-search"
+			hx-trigger="input changed delay:500ms"
+			hx-target="#home-available"
+		/>
+	</div>
+}
+
+templ HomeSortUpdateOOB() {
+	<div hx-swap-oob="innerHTML:#sortForm">
+		<select class="select select-bordered w-80" name="sort-by">
+			<option disabled selected class="text-sm">Sort Pokemon List By</option>
+			<option value="id-asc">Lowest ID - First</option>
+			<option value="id-desc">Highest ID - First</option>
+			<option value="name-asc">A - Z</option>
+			<option value="name-desc">Z - A</option>
+		</select>
+	</div>
+}
+
+templ HomeSortUpdateSelectedOOB() {
+	<div hx-swap-oob="innerHTML:#sortForm">
+		<select class="select select-bordered w-80" name="sort-by">
+			<option disabled selected class="text-sm">Sort Pokemon List By</option>
+			<option selected="selected" value="id-asc">Lowest ID - First</option>
+			<option value="id-desc">Highest ID - First</option>
+			<option value="name-asc">A - Z</option>
+			<option value="name-desc">Z - A</option>
+		</select>
 	</div>
 }
 

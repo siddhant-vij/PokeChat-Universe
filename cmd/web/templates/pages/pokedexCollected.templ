@@ -2,33 +2,8 @@ package pages
 
 import (
 	"fmt"
-	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
 )
-
-templ PokedexCollectedPage(pokedexCollected []utils.PokemonDisplay) {
-	<!DOCTYPE html>
-	<html>
-		<head>
-			<meta charset="UTF-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<link href="/cmd/web/public/css/output.css" rel="stylesheet"/>
-			<script src="/cmd/web/public/js/htmx.min.js" defer></script>
-			<script src="/cmd/web/public/js/activeTab.js" defer></script>
-			<title>PokeChat Universe</title>
-		</head>
-		<body class="bg-zinc-600 scroll-smooth">
-			<div class="flex flex-col w-[1024px] mx-auto min-h-screen bg-base-100">
-				@components.Header(false, true, "collected")
-				<main id="main" class="flex-grow">
-					@PokedexCollected(pokedexCollected)
-				</main>
-				<hr/>
-				@components.Footer()
-			</div>
-		</body>
-	</html>
-}
 
 templ PokedexCollected(pokedexCollected []utils.PokemonDisplay) {
 	@PCSearchAndSort()
@@ -38,7 +13,7 @@ templ PokedexCollected(pokedexCollected []utils.PokemonDisplay) {
 
 templ PCSearchAndSort() {
 	<div class="p-8 flex flex-row justify-around align-middle">
-		<label class="input input-bordered flex items-center gap-4 w-80">
+		<label id="searchInput" class="input input-bordered flex items-center gap-4 w-80">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-4 w-4 opacity-70">
 				<path
 					fill-rule="evenodd"
@@ -74,21 +49,49 @@ templ PCSearchAndSort() {
 	</div>
 }
 
+templ PCSearchUpdateOOB() {
+	<div hx-swap-oob="innerHTML:#searchInput">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-4 w-4 opacity-70">
+			<path
+				fill-rule="evenodd"
+				d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+				clip-rule="evenodd"
+			></path>
+		</svg>
+		<input
+			type="search"
+			class="grow text-sm"
+			autofocus
+			placeholder="Enter Pokemon Name"
+			name="pokemonName"
+			hx-get="/pc-search"
+			hx-trigger="input changed delay:500ms, search"
+			hx-target="#pokedex-collected"
+		/>
+	</div>
+}
+
 templ PCSortUpdateOOB() {
 	<div hx-swap-oob="innerHTML:#sortForm">
-		<form
-			hx-get="/pc-sort"
-			hx-trigger="change"
-			hx-target="#pokedex-collected"
-		>
-			<select class="select select-bordered w-80" name="sort-by">
-				<option disabled selected class="text-sm">Sort Pokemon List By</option>
-				<option selected="selected" value="id-asc">Lowest ID - First</option>
-				<option value="id-desc">Highest ID - First</option>
-				<option value="name-asc">A - Z</option>
-				<option value="name-desc">Z - A</option>
-			</select>
-		</form>
+		<select class="select select-bordered w-80" name="sort-by">
+			<option disabled selected class="text-sm">Sort Pokemon List By</option>
+			<option value="id-asc">Lowest ID - First</option>
+			<option value="id-desc">Highest ID - First</option>
+			<option value="name-asc">A - Z</option>
+			<option value="name-desc">Z - A</option>
+		</select>
+	</div>
+}
+
+templ PCSortUpdateSelectedOOB() {
+	<div hx-swap-oob="innerHTML:#sortForm">
+		<select class="select select-bordered w-80" name="sort-by">
+			<option disabled selected class="text-sm">Sort Pokemon List By</option>
+			<option selected="selected" value="id-asc">Lowest ID - First</option>
+			<option value="id-desc">Highest ID - First</option>
+			<option value="name-asc">A - Z</option>
+			<option value="name-desc">Z - A</option>
+		</select>
 	</div>
 }
 
@@ -129,10 +132,12 @@ templ PokedexCollectedPokemonCard(pokemon utils.PokemonDisplay, sortByState stri
 					View Details
 				</button>
 				<button
-					class="btn btn-success"
-					hx-get="/pokeChat"
+					class="btn btn-success chatBtn"
+					hx-get="/chat"
 					hx-trigger="click"
 					hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, utils.FormatName(pokemon.Name)) }
+					hx-target="#main"
+					hx-swap="innerHTML"
 				>
 					Chat
 				</button>

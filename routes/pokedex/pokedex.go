@@ -62,37 +62,3 @@ func ServeAvailablePage(w http.ResponseWriter, r *http.Request, cfg *config.AppC
 	pokedexPage := pages.PokedexPage(paPokemons)
 	pokedexPage.Render(r.Context(), w)
 }
-
-func ServeCollectedPage(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
-	currentCollectedOffset = 0
-	initialLimit := 12
-
-	params := pokedex.GetUserCollectedPokemonsSortedByIdAscParams{
-		UserID: cfg.LoggedInUserId,
-		Limit:  int32(initialLimit),
-		Offset: int32(currentCollectedOffset),
-	}
-	pokemonList, err := cfg.DBQueries.GetUserCollectedPokemonsSortedByIdAsc(context.Background(), params)
-	if err != nil {
-		log.Fatalf("error getting the initial user collected pokemon list from DB - Pokedex Collected Tab. Err: %v", err)
-		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
-		serverErrorPage.Render(r.Context(), w)
-		return
-	}
-
-	var pcPokemons = make([]utils.PokemonDisplay, 0)
-
-	for _, pokemon := range pokemonList {
-		pcPokemons = append(pcPokemons, utils.PokemonDisplay{
-			ID:         utils.FormatID(int(pokemon.ID)),
-			Name:       utils.FormatName(pokemon.Name),
-			PictureUrl: pokemon.PictureUrl,
-			Types:      utils.DisplayTypes(pokemon.Types),
-		})
-	}
-
-	currentCollectedOffset += initialLimit
-
-	pokedexCollectedPage := pages.PokedexCollectedPage(pcPokemons)
-	pokedexCollectedPage.Render(r.Context(), w)
-}

@@ -14,6 +14,7 @@ import (
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
 	"github.com/siddhant-vij/PokeChat-Universe/middlewares"
 	authroutes "github.com/siddhant-vij/PokeChat-Universe/routes/auth"
+	chatroutes "github.com/siddhant-vij/PokeChat-Universe/routes/chat"
 	pokedexroutes "github.com/siddhant-vij/PokeChat-Universe/routes/pokedex"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/crud"
 	"github.com/siddhant-vij/PokeChat-Universe/routes/test/health"
@@ -165,9 +166,9 @@ func PageHandlers(mux *http.ServeMux) {
 		pokedexroutes.CollectPokemonHandlerOnPokemonPage(w, r, appConfig)
 	}), appConfig))
 
-	mux.Handle("/pokeChat", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatPokedexHandler), appConfig))
-
-	mux.Handle("/pokeChat/", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatWithPokemonHandler), appConfig))
+	mux.Handle("/chat/", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		chatroutes.ChatWithPokemonHandler(w, r, appConfig)
+	}), appConfig))
 }
 
 func PokedexHandlers(mux *http.ServeMux) {
@@ -179,7 +180,9 @@ func PokedexHandlers(mux *http.ServeMux) {
 		pokedexroutes.CollectedPokedexHandler(w, r, appConfig)
 	}), appConfig))
 
-	// mux.Handle("/chat", middlewares.IsAuthenticated(http.HandlerFunc(pokedexroutes.ChatRedirectHandler), appConfig))
+	mux.Handle("/chat", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		chatroutes.ChatWithPokemonHandler(w, r, appConfig)
+	}), appConfig))
 }
 
 func LoadMoreHandlers(mux *http.ServeMux) {

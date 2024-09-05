@@ -15,17 +15,27 @@ templ PokemonPage(pokemon pokedex.Pokemon, authStatus, isCollected bool, evoluti
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link href="/cmd/web/public/css/output.css" rel="stylesheet"/>
 			<script src="/cmd/web/public/js/htmx.min.js" defer></script>
+			<script src="/cmd/web/public/js/activeTab.js" defer></script>
+			<script src="/cmd/web/public/js/activeChat.js" defer></script>
 			<title>PokeChat Universe</title>
 		</head>
-		<body class="bg-zinc-600 scroll-smooth">
+		<body class="bg-zinc-600 scroll-smooth overflow-y-scroll">
 			<div class="flex flex-col w-[1024px] mx-auto min-h-screen bg-base-100">
-				@components.Header(true, authStatus, "pokemon")
+				<div id="header">
+					@components.Header(true, authStatus, "pokemon")
+				</div>
 				@PokemonDetails(pokemon, authStatus, isCollected, evolutionChain)
 				<hr/>
 				@components.Footer()
 			</div>
 		</body>
 	</html>
+}
+
+templ ChatHeaderUpdateOOB(authStatus bool) {
+	<div hx-swap-oob="innerHTML:#header">
+		@components.Header(false, authStatus, "chat")
+	</div>
 }
 
 templ PokemonDetails(pokemon pokedex.Pokemon, authStatus, isCollected bool, evolutionChain []pokedex.GetFullEvolutionChainRow) {
@@ -166,9 +176,12 @@ templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 			if isCollected {
 				<button
 					class="btn btn-success"
-					hx-get="/pokeChat"
+					hx-get="/chat"
 					hx-trigger="click"
 					hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, name) }
+					hx-target="#main"
+					hx-swap="innerHTML"
+					hx-replace-url="/pokedex"
 				>
 					Chat with { name }
 				</button>
@@ -202,9 +215,12 @@ templ PokemonCollectedButton(name string) {
 		</button>
 		<button
 			class="btn btn-success"
-			hx-get="/pokeChat"
+			hx-get="/chat"
 			hx-trigger="click"
 			hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, name) }
+			hx-target="#main"
+			hx-swap="innerHTML"
+			hx-replace-url="/pokedex"
 		>
 			Chat with { name }
 		</button>
