@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-const apiUrl = "https://pokeapi.co/api/v2/"
+const apiUrl = "https://pokeapi.co/api/v2"
 
 var rl = newRateLimiter(50) // 50 requests per second
 
