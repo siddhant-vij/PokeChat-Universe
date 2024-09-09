@@ -12,6 +12,21 @@ import (
 	"github.com/lib/pq"
 )
 
+const deleteUserCollectedPokemon = `-- name: DeleteUserCollectedPokemon :exec
+DELETE FROM user_pokemons
+WHERE user_id = $1 AND pokemon_id = $2
+`
+
+type DeleteUserCollectedPokemonParams struct {
+	UserID    uuid.UUID
+	PokemonID int32
+}
+
+func (q *Queries) DeleteUserCollectedPokemon(ctx context.Context, arg DeleteUserCollectedPokemonParams) error {
+	_, err := q.db.ExecContext(ctx, deleteUserCollectedPokemon, arg.UserID, arg.PokemonID)
+	return err
+}
+
 const getOneAvailablePokemonAfterCollectionByIdAsc = `-- name: GetOneAvailablePokemonAfterCollectionByIdAsc :one
 SELECT
   pokemons.id,

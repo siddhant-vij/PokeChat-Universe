@@ -173,6 +173,14 @@ func PageHandlers(mux *http.ServeMux) {
 	mux.Handle("/chat/", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		chatroutes.PokedexChatHandler(w, r, appConfig)
 	}), appConfig))
+
+	mux.Handle("/add-pokemon", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		chatroutes.AddPokemonToPokedexFromChatWindow(w, r, appConfig)
+	}), appConfig))
+	
+	mux.Handle("/remove-pokemon", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		chatroutes.RemovePokemonFromPokedexInChatWindow(w, r, appConfig)
+	}), appConfig))
 }
 
 func PokedexHandlers(mux *http.ServeMux) {

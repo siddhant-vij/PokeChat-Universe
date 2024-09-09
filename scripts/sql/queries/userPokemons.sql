@@ -12,6 +12,10 @@ SELECT
     WHERE user_id = $1 AND pokemon_id = $2
   );
 
+-- name: DeleteUserCollectedPokemon :exec
+DELETE FROM user_pokemons
+WHERE user_id = $1 AND pokemon_id = $2;
+
 -- name: SearchUserCollectedPokemonsByName :many
 SELECT
   pokemons.id,

@@ -42,7 +42,7 @@ templ ChatPokemonDetails(pokemon pokedex.Pokemon, isCollected bool) {
 		@ChatPokemonDetailsHeader(utils.FormatName(pokemon.Name), pokemon.PictureUrl, utils.FormatID(int(pokemon.ID)))
 		@ChatPokemonBasicDetails(utils.FormatHeight(pokemon.Height), utils.FormatWeight(pokemon.Weight), utils.FormatBaseExp(pokemon.BaseExperience), utils.DisplayTypes(pokemon.Types))
 		@ChatPokemonStats(utils.GetChatStats(pokemon), utils.GetChatMaxStats())
-		@ChatPokemonFooter(isCollected)
+		@ChatPokemonFooter(isCollected, int(pokemon.ID))
 	</div>
 }
 
@@ -109,7 +109,7 @@ templ ChatPokemonStats(stats, maxStats []int) {
 }
 
 templ ChatWindow(name string, isCollected bool) {
-	<div class="basis-7/12 flex flex-col h-full">
+	<div id="chatWindow" class="basis-7/12 flex flex-col h-full">
 		if isCollected {
 			<div
 				class="p-8 py-2 card card-side justify-center bg-base-300 rounded-none gap-16 items-center overflow-y-auto h-full"
@@ -126,10 +126,75 @@ templ ChatWindow(name string, isCollected bool) {
 	</div>
 }
 
-templ ChatPokemonFooter(isCollected bool) {
+templ ChatWindowUpdateOnAdd(name string) {
+	<div
+		class="p-8 py-2 card card-side justify-center bg-base-300 rounded-none gap-16 items-center overflow-y-auto h-full"
+	>
+		Chat with { name }...
+	</div>
+}
+
+templ ChatWindowUpdateOnRemove(name string) {
+	<div
+		class="p-8 py-2 card card-side justify-center bg-base-300 rounded-none gap-16 items-center overflow-y-auto h-full"
+	>
+		Add { name } to Pokedex first...
+	</div>
+}
+
+templ ChatPokemonFooter(isCollected bool, id int) {
 	if isCollected {
-		<button class="mx-16 mt-10 btn btn-success">Remove from Pokedex</button>
+		<button
+			id="chatPokemonFooterRemoveBtn"
+			class="mx-16 mt-10 btn btn-success"
+			hx-get="/remove-pokemon"
+			hx-trigger="click"
+			hx-vals={ fmt.Sprintf(`{"pokemonIdStr": "%s"}`, utils.FormatID(id)) }
+			hx-target="#chatWindow"
+			hx-swap="innerHTML"
+		>
+			Remove from Pokedex
+		</button>
 	} else {
-		<button class="mx-16 mt-10 btn btn-success">Add to Pokedex</button>
+		<button
+			id="chatPokemonFooterAddBtn"
+			class="mx-16 mt-10 btn btn-success"
+			hx-get="/add-pokemon"
+			hx-trigger="click"
+			hx-vals={ fmt.Sprintf(`{"pokemonIdStr": "%s"}`, utils.FormatID(id)) }
+			hx-target="#chatWindow"
+			hx-swap="innerHTML"
+		>
+			Add to Pokedex
+		</button>
 	}
+}
+
+templ ChatPokemonFooterAddOOB(id int) {
+	<button
+		class="mx-16 mt-10 btn btn-success"
+		hx-get="/remove-pokemon"
+		hx-trigger="click"
+		hx-vals={ fmt.Sprintf(`{"pokemonIdStr": "%s"}`, utils.FormatID(id)) }
+		hx-target="#chatWindow"
+		hx-swap="innerHTML"
+		hx-swap-oob="outerHTML:#chatPokemonFooterAddBtn"
+	>
+		Remove from Pokedex
+	</button>
+}
+
+templ ChatPokemonFooterRemoveOOB(id int) {
+	<button
+		id="chatPokemonFooterAddBtn"
+		class="mx-16 mt-10 btn btn-success"
+		hx-get="/add-pokemon"
+		hx-trigger="click"
+		hx-vals={ fmt.Sprintf(`{"pokemonIdStr": "%s"}`, utils.FormatID(id)) }
+		hx-target="#chatWindow"
+		hx-swap="innerHTML"
+		hx-swap-oob="outerHTML:#chatPokemonFooterRemoveBtn"
+	>
+		Add to Pokedex
+	</button>
 }

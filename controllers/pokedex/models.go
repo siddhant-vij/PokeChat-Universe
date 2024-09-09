@@ -11,6 +11,13 @@ import (
 	"github.com/google/uuid"
 )
 
+type Chat struct {
+	ID            uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	UserPokemonID uuid.UUID
+}
+
 type Evolution struct {
 	ID          int32
 	ChainID     int32
