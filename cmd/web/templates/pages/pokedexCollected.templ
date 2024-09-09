@@ -2,13 +2,37 @@ package pages
 
 import (
 	"fmt"
+	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
 )
 
+templ PokedexCollectedPage(pokedexCollected []utils.PokemonDisplay) {
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link href="/cmd/web/public/css/output.css" rel="stylesheet"/>
+			<script src="/cmd/web/public/js/htmx.min.js" defer></script>
+			<title>PokeChat Universe</title>
+		</head>
+		<body class="bg-zinc-600 scroll-smooth overflow-y-scroll">
+			<div class="flex flex-col w-[1024px] mx-auto min-h-screen bg-base-100">
+				@components.Header(false, true, "collected")
+				@PokedexCollected(pokedexCollected)
+				<hr/>
+				@components.Footer()
+			</div>
+		</body>
+	</html>
+}
+
 templ PokedexCollected(pokedexCollected []utils.PokemonDisplay) {
-	@PCSearchAndSort()
-	@PCListOfPokemons(pokedexCollected)
-	@PColLoadMoreIdAscButton()
+	<main id="main" class="flex-grow">
+		@PCSearchAndSort()
+		@PCListOfPokemons(pokedexCollected)
+		@PColLoadMoreIdAscButton()
+	</main>
 }
 
 templ PCSearchAndSort() {
@@ -133,11 +157,9 @@ templ PokedexCollectedPokemonCard(pokemon utils.PokemonDisplay, sortByState stri
 				</button>
 				<button
 					class="btn btn-success chatBtn"
-					hx-get="/chat"
+					hx-get="/pokeChat"
 					hx-trigger="click"
 					hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, utils.FormatName(pokemon.Name)) }
-					hx-target="#main"
-					hx-swap="innerHTML"
 				>
 					Chat
 				</button>

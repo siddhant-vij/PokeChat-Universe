@@ -15,8 +15,6 @@ templ PokemonPage(pokemon pokedex.Pokemon, authStatus, isCollected bool, evoluti
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link href="/cmd/web/public/css/output.css" rel="stylesheet"/>
 			<script src="/cmd/web/public/js/htmx.min.js" defer></script>
-			<script src="/cmd/web/public/js/activeTab.js" defer></script>
-			<script src="/cmd/web/public/js/activeChat.js" defer></script>
 			<title>PokeChat Universe</title>
 		</head>
 		<body class="bg-zinc-600 scroll-smooth overflow-y-scroll">
@@ -30,12 +28,6 @@ templ PokemonPage(pokemon pokedex.Pokemon, authStatus, isCollected bool, evoluti
 			</div>
 		</body>
 	</html>
-}
-
-templ ChatHeaderUpdateOOB(authStatus bool) {
-	<div hx-swap-oob="innerHTML:#header">
-		@components.Header(false, authStatus, "chat")
-	</div>
 }
 
 templ PokemonDetails(pokemon pokedex.Pokemon, authStatus, isCollected bool, evolutionChain []pokedex.GetFullEvolutionChainRow) {
@@ -165,23 +157,28 @@ templ EvolutionCard(evolutionChain []pokedex.GetFullEvolutionChainRow) {
 
 templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 	<div class="flex flex-row justify-center gap-10">
-		<button
-			class="btn btn-outline btn-primary"
-			hx-get="/pokedex"
-			hx-trigger="click"
-		>
-			Explore more Pokemon
-		</button>
+		if isCollected {
+			<a
+				href="/collectedPokedex"
+				class="btn btn-outline btn-primary"
+			>
+				Explore more Pokemon
+			</a>
+		} else {
+			<a
+				href="/pokedex"
+				class="btn btn-outline btn-primary"
+			>
+				Explore more Pokemon
+			</a>
+		}
 		if authStatus {
 			if isCollected {
 				<button
 					class="btn btn-success"
-					hx-get="/chat"
+					hx-get="/pokeChat"
 					hx-trigger="click"
 					hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, name) }
-					hx-target="#main"
-					hx-swap="innerHTML"
-					hx-replace-url="/pokedex"
 				>
 					Chat with { name }
 				</button>
@@ -206,21 +203,17 @@ templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 
 templ PokemonCollectedButton(name string) {
 	<div class="flex flex-row justify-center gap-10">
-		<button
+		<a
+			href="/collectedPokedex"
 			class="btn btn-outline btn-primary"
-			hx-get="/pokedex"
-			hx-trigger="click"
 		>
 			Explore more Pokemon
-		</button>
+		</a>
 		<button
 			class="btn btn-success"
-			hx-get="/chat"
+			hx-get="/pokeChat"
 			hx-trigger="click"
 			hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, name) }
-			hx-target="#main"
-			hx-swap="innerHTML"
-			hx-replace-url="/pokedex"
 		>
 			Chat with { name }
 		</button>

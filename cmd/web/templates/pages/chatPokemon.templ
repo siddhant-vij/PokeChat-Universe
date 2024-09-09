@@ -1,0 +1,123 @@
+package pages
+
+import (
+	"fmt"
+	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
+)
+
+templ PokedexChatPokemonPage(pokemon pokedex.Pokemon) {
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link href="/cmd/web/public/css/output.css" rel="stylesheet"/>
+			<script src="/cmd/web/public/js/htmx.min.js" defer></script>
+			<title>PokeChat Universe</title>
+		</head>
+		<body class="bg-zinc-600 scroll-smooth overflow-y-scroll">
+			<div class="flex flex-col w-[1024px] mx-auto h-screen bg-base-100">
+				@components.Header(false, true, "chat")
+				<main id="main" class="flex-grow flex overflow-hidden">
+					@ChatWithPokemonMain(pokemon)
+				</main>
+				<hr/>
+				@components.Footer()
+			</div>
+		</body>
+	</html>
+}
+
+templ ChatWithPokemonMain(pokemon pokedex.Pokemon) {
+	<div class="p-8 flex flex-row justify-center gap-8 h-full w-full">
+		@ChatPokemonDetails(pokemon)
+		@ChatWindow(utils.FormatName(pokemon.Name))
+	</div>
+}
+
+templ ChatPokemonDetails(pokemon pokedex.Pokemon) {
+	<div class="pt-8 basis-5/12 flex flex-col bg-base-300 gap-4 h-full">
+		@ChatPokemonDetailsHeader(utils.FormatName(pokemon.Name), pokemon.PictureUrl, utils.FormatID(int(pokemon.ID)))
+		@ChatPokemonBasicDetails(utils.FormatHeight(pokemon.Height), utils.FormatWeight(pokemon.Weight), utils.FormatBaseExp(pokemon.BaseExperience), utils.DisplayTypes(pokemon.Types))
+		@ChatPokemonStats(utils.GetChatStats(pokemon), utils.GetChatMaxStats())
+		@ChatPokemonFooter()
+	</div>
+}
+
+templ ChatPokemonDetailsHeader(name, pictureUrl, id string) {
+	<div class="card card-side justify-center gap-16">
+		<figure class="hover:scale-110">
+			<img
+				src={ pictureUrl }
+				alt={ name }
+				class="p-2 w-32"
+			/>
+		</figure>
+		<div class="flex flex-col gap-2 justify-center items-start">
+			<h2 class="card-title">{ name }</h2>
+			<p>{ id }</p>
+		</div>
+	</div>
+}
+
+templ ChatPokemonBasicDetails(height, weight, baseExp string, types []string) {
+	<div class="pt-6 pb-10 card card-side justify-center gap-16">
+		<div class="flex flex-col justify-around gap-4">
+			<div class="flex flex-row justify-normal gap-8">
+				<h2 class="font-medium">Height: <span class="font-semibold">{ height }</span></h2>
+				<h2 class="font-medium">Weight: <span class="font-semibold">{ weight }</span></h2>
+			</div>
+			<h2 class="font-medium">Base Experience: <span class="font-semibold">{ baseExp }</span></h2>
+			<div class="flex flex-row justify-normal gap-4 items-center">
+				<h2 class="font-medium">Types:</h2>
+				<div class="flex flex-row justify-normal gap-4">
+					for _, pokemonType := range types {
+						<div class="badge badge-outline text-sm h-9 pl-8 pr-8">{ pokemonType }</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+css width(stat, maxStat int) {
+	width: { templ.SafeCSSProperty(fmt.Sprintf("%d%%", stat*100/maxStat)) };
+}
+
+templ ChatPokemonStats(stats, maxStats []int) {
+	for i := 0; i < 4; i++ {
+		<div class="px-12 flex flex-row justify-end gap-8 items-center">
+			<h2 class="text-md font-extrabold">
+				switch i {
+					case 0:
+						HP
+					case 1:
+						Attack
+					case 2:
+						Defense
+					case 3:
+						Speed
+				}
+			</h2>
+			<div class="h-10 w-48 bg-gray-100 relative rounded-sm">
+				<div class={ "h-full bg-primary absolute bottom-0 rounded-sm tooltip tooltip-right", width(stats[i], maxStats[i]) } data-tip={ fmt.Sprintf("%d%%", stats[i]*100/maxStats[i]) }></div>
+			</div>
+		</div>
+	}
+}
+
+templ ChatWindow(name string) {
+	<div class="basis-7/12 flex flex-col h-full">
+		<div
+			class="p-8 py-2 card card-side justify-center bg-base-300 rounded-none gap-16 items-center overflow-y-auto h-full"
+		>
+			Chat with { name }
+		</div>
+	</div>
+}
+
+templ ChatPokemonFooter() {
+	<button class="mx-16 mt-10 btn btn-success">Remove from Pokedex</button>
+}

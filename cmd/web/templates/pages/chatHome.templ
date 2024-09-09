@@ -1,0 +1,95 @@
+package pages
+
+import (
+	"fmt"
+	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
+)
+
+templ PokedexChatHome(collectedPokemon []utils.PokemonDisplay) {
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link href="/cmd/web/public/css/output.css" rel="stylesheet"/>
+			<script src="/cmd/web/public/js/htmx.min.js" defer></script>
+			<title>PokeChat Universe</title>
+		</head>
+		<body class="bg-zinc-600 scroll-smooth overflow-y-scroll">
+			<div class="flex flex-col w-[1024px] mx-auto h-screen bg-base-100">
+				@components.Header(false, true, "chat")
+				@ChatHomeMain(collectedPokemon)
+				<hr/>
+				@components.Footer()
+			</div>
+		</body>
+	</html>
+}
+
+templ ChatHomeMain(collectedPokemon []utils.PokemonDisplay) {
+	<main id="main" class="flex-grow flex overflow-hidden">
+		<div class="p-8 flex flex-row justify-center gap-8 h-full w-full">
+			<div class="pt-8 basis-5/12 flex flex-col bg-base-300 gap-4 h-full overflow-y-auto">
+				for _, pokemon := range collectedPokemon {
+					@ChatPokemonCard(pokemon)
+				}
+				<div id="chatLoadMore" class="p-8 grid grid-cols-1 justify-center justify-items-center content-center gap-y-8">
+					@ChatHomeLoadMoreBtn()
+				</div>
+			</div>
+			<div class="basis-7/12 flex flex-col h-full">
+				<div class="p-8 py-2 card card-side justify-center bg-base-300 rounded-none gap-16 h-full items-center">
+					Select a Pokemon to chat with...
+				</div>
+			</div>
+		</div>
+	</main>
+}
+
+templ ChatPokemonCard(pokemon utils.PokemonDisplay) {
+	<button
+		class="mx-8 my-2 px-4 card card-side justify-between gap-4 bg-base-100 rounded-sm"
+		hx-get="/pokeChat"
+		hx-trigger="click"
+		hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, utils.FormatName(pokemon.Name)) }
+	>
+		<div class="flex flex-col gap-2 justify-center items-start">
+			<p>{ pokemon.ID }</p>
+		</div>
+		<div class="flex flex-col gap-2 justify-center items-start">
+			<h2 class="card-title">{ pokemon.Name }</h2>
+		</div>
+		<figure class="hover:scale-110">
+			<img
+				src={ pokemon.PictureUrl }
+				alt={ pokemon.Name }
+				class="p-4 w-24"
+			/>
+		</figure>
+	</button>
+}
+
+templ ChatHomeLoadMoreBtn() {
+	<button
+		id="chatHomeLoadMoreBtn"
+		class="btn btn-active btn-primary"
+		hx-get="/chat-load-more"
+		hx-trigger="click"
+		hx-target="#chatLoadMore"
+		hx-swap="beforebegin"
+	>
+		Load more Pokemon
+	</button>
+}
+
+templ ChatHomeLoadMoreBtnDisabled() {
+	<button
+		id="chatHomeLoadMoreBtn"
+		class="btn btn-outline btn-ghost tooltip tooltip-success cursor-default"
+		data-tip="No more Pokemon to load"
+		hx-swap-oob="outerHTML:#chatHomeLoadMoreBtn"
+	>
+		Load more Pokemon
+	</button>
+}

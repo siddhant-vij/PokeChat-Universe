@@ -12,7 +12,12 @@ import (
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
 )
 
-func AvailablePokedexHandler(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
+var (
+	currentAvailableOffset int
+	lastFetchedPokemon     map[string]string
+)
+
+func ServeAvailablePage(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	currentAvailableOffset = 0
 	lastFetchedPokemon = make(map[string]string)
 	initialLimit := 12
@@ -46,8 +51,8 @@ func AvailablePokedexHandler(w http.ResponseWriter, r *http.Request, cfg *config
 
 	currentAvailableOffset += initialLimit
 
-	pokedexAvailable := pages.PokedexAvailable(paPokemons)
-	pokedexAvailable.Render(r.Context(), w)
+	pokedexPage := pages.PokedexPage(paPokemons)
+	pokedexPage.Render(r.Context(), w)
 }
 
 func PokedexAvailableSort(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {

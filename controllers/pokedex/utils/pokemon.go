@@ -52,3 +52,12 @@ func GetMaxStats() []int {
 	// From https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_base_stats_in_Generation_IX
 	return []int{255, 190, 250, 194, 250, 200}
 }
+
+func GetChatStats(pokemon pokedex.Pokemon) []int {
+	return []int{int(pokemon.Hp), int(pokemon.Attack), int(pokemon.Defense), int(pokemon.Speed)}
+}
+
+func GetChatMaxStats() []int {
+	// From https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_base_stats_in_Generation_IX
+	return []int{255, 190, 250, 200}
+}

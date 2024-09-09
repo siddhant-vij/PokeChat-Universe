@@ -149,7 +149,11 @@ func PageHandlers(mux *http.ServeMux) {
 	}))
 
 	mux.Handle("/pokedex", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		pokedexroutes.ServePokedexPage(w, r, appConfig)
+		pokedexroutes.ServeAvailablePage(w, r, appConfig)
+	}), appConfig))
+
+	mux.Handle("/collectedPokedex", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pokedexroutes.ServeCollectedPage(w, r, appConfig)
 	}), appConfig))
 
 	mux.HandleFunc("/getPokemon", pokedexroutes.GetPokemonHandler)
@@ -167,22 +171,16 @@ func PageHandlers(mux *http.ServeMux) {
 	}), appConfig))
 
 	mux.Handle("/chat/", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		chatroutes.ChatWithPokemonHandler(w, r, appConfig)
+		chatroutes.PokedexChatHandler(w, r, appConfig)
 	}), appConfig))
 }
 
 func PokedexHandlers(mux *http.ServeMux) {
-	mux.Handle("/available", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		pokedexroutes.AvailablePokedexHandler(w, r, appConfig)
-	}), appConfig))
+	mux.Handle("/available", middlewares.IsAuthenticated(http.HandlerFunc(AvailableRedirectHandler), appConfig))
 
-	mux.Handle("/collected", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		pokedexroutes.CollectedPokedexHandler(w, r, appConfig)
-	}), appConfig))
+	mux.Handle("/collected", middlewares.IsAuthenticated(http.HandlerFunc(CollectedRedirectHandler), appConfig))
 
-	mux.Handle("/chat", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		chatroutes.ChatWithPokemonHandler(w, r, appConfig)
-	}), appConfig))
+	mux.Handle("/pokeChat", middlewares.IsAuthenticated(http.HandlerFunc(ChatRedirectHandler), appConfig))
 }
 
 func LoadMoreHandlers(mux *http.ServeMux) {
@@ -196,6 +194,10 @@ func LoadMoreHandlers(mux *http.ServeMux) {
 
 	mux.Handle("/pc-load-more", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pokedexroutes.PokedexCollectedLoadMore(w, r, appConfig)
+	}), appConfig))
+
+	mux.Handle("/chat-load-more", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		chatroutes.PokedexChatLoadMoreHandler(w, r, appConfig)
 	}), appConfig))
 }
 

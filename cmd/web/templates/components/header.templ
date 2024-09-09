@@ -17,8 +17,6 @@ templ Header(isErrorPage, authStatus bool, activeTab string) {
 										class="active"
 										hx-get="/available"
 										hx-trigger="click"
-										hx-target="#main"
-										hx-swap="innerHTML"
 									>
 										Available
 									</a>
@@ -29,8 +27,6 @@ templ Header(isErrorPage, authStatus bool, activeTab string) {
 										id="available-tab"
 										hx-get="/available"
 										hx-trigger="click"
-										hx-target="#main"
-										hx-swap="innerHTML"
 									>
 										Available
 									</a>
@@ -43,8 +39,6 @@ templ Header(isErrorPage, authStatus bool, activeTab string) {
 										class="active"
 										hx-get="/collected"
 										hx-trigger="click"
-										hx-target="#main"
-										hx-swap="innerHTML"
 									>
 										Collected
 									</a>
@@ -55,8 +49,6 @@ templ Header(isErrorPage, authStatus bool, activeTab string) {
 										id="collected-tab"
 										hx-get="/collected"
 										hx-trigger="click"
-										hx-target="#main"
-										hx-swap="innerHTML"
 									>
 										Collected
 									</a>
@@ -67,10 +59,8 @@ templ Header(isErrorPage, authStatus bool, activeTab string) {
 									<a
 										id="chat-tab"
 										class="active"
-										hx-get="/chat"
+										hx-get="/pokeChat"
 										hx-trigger="click"
-										hx-target="#main"
-										hx-swap="innerHTML"
 									>
 										Chat
 									</a>
@@ -79,10 +69,8 @@ templ Header(isErrorPage, authStatus bool, activeTab string) {
 								<li>
 									<a
 										id="chat-tab"
-										hx-get="/chat"
+										hx-get="/pokeChat"
 										hx-trigger="click"
-										hx-target="#main"
-										hx-swap="innerHTML"
 									>
 										Chat
 									</a>

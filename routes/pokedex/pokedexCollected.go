@@ -14,7 +14,7 @@ import (
 
 var currentCollectedOffset int
 
-func CollectedPokedexHandler(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
+func ServeCollectedPage(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	currentCollectedOffset = 0
 	initialLimit := 12
 
@@ -44,8 +44,8 @@ func CollectedPokedexHandler(w http.ResponseWriter, r *http.Request, cfg *config
 
 	currentCollectedOffset += initialLimit
 
-	pokedexCollected := pages.PokedexCollected(pcPokemons)
-	pokedexCollected.Render(r.Context(), w)
+	pokedexCollectedPage := pages.PokedexCollectedPage(pcPokemons)
+	pokedexCollectedPage.Render(r.Context(), w)
 }
 
 func PokedexCollectedSort(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
