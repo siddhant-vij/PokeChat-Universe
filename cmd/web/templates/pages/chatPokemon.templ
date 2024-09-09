@@ -7,7 +7,7 @@ import (
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
 )
 
-templ PokedexChatPokemonPage(pokemon pokedex.Pokemon) {
+templ PokedexChatPokemonPage(pokemon pokedex.Pokemon, isCollected bool) {
 	<!DOCTYPE html>
 	<html>
 		<head>
@@ -21,7 +21,7 @@ templ PokedexChatPokemonPage(pokemon pokedex.Pokemon) {
 			<div class="flex flex-col w-[1024px] mx-auto h-screen bg-base-100">
 				@components.Header(false, true, "chat")
 				<main id="main" class="flex-grow flex overflow-hidden">
-					@ChatWithPokemonMain(pokemon)
+					@ChatWithPokemonMain(pokemon, isCollected)
 				</main>
 				<hr/>
 				@components.Footer()
@@ -30,19 +30,19 @@ templ PokedexChatPokemonPage(pokemon pokedex.Pokemon) {
 	</html>
 }
 
-templ ChatWithPokemonMain(pokemon pokedex.Pokemon) {
+templ ChatWithPokemonMain(pokemon pokedex.Pokemon, isCollected bool) {
 	<div class="p-8 flex flex-row justify-center gap-8 h-full w-full">
-		@ChatPokemonDetails(pokemon)
-		@ChatWindow(utils.FormatName(pokemon.Name))
+		@ChatPokemonDetails(pokemon, isCollected)
+		@ChatWindow(utils.FormatName(pokemon.Name), isCollected)
 	</div>
 }
 
-templ ChatPokemonDetails(pokemon pokedex.Pokemon) {
+templ ChatPokemonDetails(pokemon pokedex.Pokemon, isCollected bool) {
 	<div class="pt-8 basis-5/12 flex flex-col bg-base-300 gap-4 h-full">
 		@ChatPokemonDetailsHeader(utils.FormatName(pokemon.Name), pokemon.PictureUrl, utils.FormatID(int(pokemon.ID)))
 		@ChatPokemonBasicDetails(utils.FormatHeight(pokemon.Height), utils.FormatWeight(pokemon.Weight), utils.FormatBaseExp(pokemon.BaseExperience), utils.DisplayTypes(pokemon.Types))
 		@ChatPokemonStats(utils.GetChatStats(pokemon), utils.GetChatMaxStats())
-		@ChatPokemonFooter()
+		@ChatPokemonFooter(isCollected)
 	</div>
 }
 
@@ -108,16 +108,28 @@ templ ChatPokemonStats(stats, maxStats []int) {
 	}
 }
 
-templ ChatWindow(name string) {
+templ ChatWindow(name string, isCollected bool) {
 	<div class="basis-7/12 flex flex-col h-full">
-		<div
-			class="p-8 py-2 card card-side justify-center bg-base-300 rounded-none gap-16 items-center overflow-y-auto h-full"
-		>
-			Chat with { name }
-		</div>
+		if isCollected {
+			<div
+				class="p-8 py-2 card card-side justify-center bg-base-300 rounded-none gap-16 items-center overflow-y-auto h-full"
+			>
+				Chat with { name }...
+			</div>
+		} else {
+			<div
+				class="p-8 py-2 card card-side justify-center bg-base-300 rounded-none gap-16 items-center overflow-y-auto h-full"
+			>
+				Add { name } to Pokedex first...
+			</div>
+		}
 	</div>
 }
 
-templ ChatPokemonFooter() {
-	<button class="mx-16 mt-10 btn btn-success">Remove from Pokedex</button>
+templ ChatPokemonFooter(isCollected bool) {
+	if isCollected {
+		<button class="mx-16 mt-10 btn btn-success">Remove from Pokedex</button>
+	} else {
+		<button class="mx-16 mt-10 btn btn-success">Add to Pokedex</button>
+	}
 }

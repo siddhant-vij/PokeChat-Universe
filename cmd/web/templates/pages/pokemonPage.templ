@@ -158,22 +158,15 @@ templ EvolutionCard(evolutionChain []pokedex.GetFullEvolutionChainRow) {
 templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 	<div class="flex flex-row justify-center gap-10">
 		if isCollected {
-			<a
-				href="/collectedPokedex"
-				class="btn btn-outline btn-primary"
-			>
-				Explore more Pokemon
-			</a>
-		} else {
-			<a
-				href="/pokedex"
-				class="btn btn-outline btn-primary"
-			>
-				Explore more Pokemon
-			</a>
 		}
 		if authStatus {
 			if isCollected {
+				<a
+					href="/collectedPokedex"
+					class="btn btn-outline btn-primary"
+				>
+					Explore more Pokemon
+				</a>
 				<button
 					class="btn btn-success"
 					hx-get="/pokeChat"
@@ -183,6 +176,12 @@ templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 					Chat with { name }
 				</button>
 			} else {
+				<a
+					href="/pokedex"
+					class="btn btn-outline btn-primary"
+				>
+					Explore more Pokemon
+				</a>
 				<button
 					id="collectBtn"
 					class="btn btn-success"
@@ -196,6 +195,12 @@ templ PokemonFooter(idStr, name string, authStatus, isCollected bool) {
 				</button>
 			}
 		} else {
+			<a
+				href="/"
+				class="btn btn-outline btn-primary"
+			>
+				Explore more Pokemon
+			</a>
 			<button class="btn btn-outline btn-ghost tooltip tooltip-success cursor-default" data-tip="Login to collect">Collect { name }</button>
 		}
 	</div>

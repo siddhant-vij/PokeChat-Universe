@@ -4,7 +4,11 @@ templ Header(isErrorPage, authStatus bool, activeTab string) {
 	<header class="px-8 z-10 sticky top-0 bg-base-100">
 		<div class="navbar">
 			<div class="navbar-start">
-				<a href="/pokedex" class="btn btn-ghost text-xl">PokeChat</a>
+				if authStatus {
+					<a href="/pokedex" class="btn btn-ghost text-xl">PokeChat</a>
+				} else {
+					<a href="/" class="btn btn-ghost text-xl">PokeChat</a>
+				}
 			</div>
 			if !isErrorPage {
 				<div class="navbar-center">
