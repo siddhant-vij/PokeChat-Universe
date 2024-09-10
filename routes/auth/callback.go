@@ -85,6 +85,7 @@ func ServeCallbackPage(w http.ResponseWriter, r *http.Request, authenticator *au
 		return
 	}
 	cfg.LoggedInUserId = userId
+	cfg.LoggedInUserName = userDataFromToken.Username
 	cfg.AuthStatus = true
 	http.Redirect(w, r, "/pokedex", http.StatusTemporaryRedirect)
 }

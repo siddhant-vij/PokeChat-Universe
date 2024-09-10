@@ -47,7 +47,7 @@ func ChatWithPokemonHandler(w http.ResponseWriter, r *http.Request, pokemonName 
 		return
 	}
 
-	chatPokemon := pages.PokedexChatPokemonPage(pokemon, isCollected)
+	chatPokemon := pages.PokedexChatPokemonPage(pokemon, cfg.LoggedInUserName, isCollected)
 	chatPokemon.Render(r.Context(), w)
 }
 
@@ -96,7 +96,7 @@ func AddPokemonToPokedexFromChatWindow(w http.ResponseWriter, r *http.Request, c
 	}
 	pokemonName := utils.FormatName(pokemon.Name)
 
-	addChatUpdate := pages.ChatWindowUpdateOnAdd(pokemonName)
+	addChatUpdate := pages.ChatWindowUpdateOnAdd(pokemonName, cfg.LoggedInUserName)
 	addChatUpdate.Render(r.Context(), w)
 
 	buttonUpdateOOB := pages.ChatPokemonFooterAddOOB(int(pokemon.ID))

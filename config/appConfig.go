@@ -36,4 +36,5 @@ type AppConfig struct {
 	AccessTokenIssuedAt time.Time
 	AuthStatus          bool
 	LoggedInUserId      uuid.UUID
+	LoggedInUserName    string
 }
