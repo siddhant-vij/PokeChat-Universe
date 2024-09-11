@@ -147,24 +147,30 @@ templ ChatMessageForm(pokemonName string) {
 		hx-trigger="submit"
 		hx-target="#chatMessages"
 		hx-swap="beforeend"
+		hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, pokemonName) }
 	>
-		<input
-			type="text"
-			placeholder={ fmt.Sprintf("Message %s", pokemonName) }
-			class="input input-bordered input-primary w-96"
-			name="userMessage"
-			hx-get="/chatMsg"
-			hx-trigger="input changed delay:100ms"
-			hx-target="#sendMsgBtn"
-			hx-swap="outerHTML"
-		/>
+		@EmptyInputFormPostSend(pokemonName)
 		@DisabledSendButton()
 	</form>
 }
 
+templ EmptyInputFormPostSend(pokemonName string) {
+	<input
+		id="msgInput"
+		type="text"
+		placeholder={ fmt.Sprintf("Message %s", pokemonName) }
+		class="input input-bordered input-primary w-96"
+		name="userMessage"
+		hx-get="/chatMsg"
+		hx-trigger="input changed delay:100ms"
+		hx-target="#sendMsgBtn"
+		hx-swap="outerHTML"
+	/>
+}
+
 templ EmptyInputFormPostSendOOB(pokemonName string) {
-	<div hx-swap-oob="outerHTML:#chatInputForm">
-		@ChatMessageForm(pokemonName)
+	<div hx-swap-oob="outerHTML:#msgInput">
+		@EmptyInputFormPostSend(pokemonName)
 	</div>
 }
 
@@ -186,6 +192,12 @@ templ DisabledSendButton() {
 	</button>
 }
 
+templ DisabledSendButtonOOB() {
+	<div hx-swap-oob="outerHTML:#sendMsgBtn">
+		@DisabledSendButton()
+	</div>
+}
+
 templ ActiveSendButton() {
 	<button
 		id="sendMsgBtn"
@@ -193,6 +205,19 @@ templ ActiveSendButton() {
 	>
 		@SendIcon()
 	</button>
+}
+
+templ ResponseSendButtonOOB() {
+	<div hx-swap-oob="outerHTML:#sendMsgBtn">
+		<button
+			id="sendMsgBtn"
+			class="btn-disabled btn-ghost flex h-10 w-10 items-center justify-center rounded-md bg-neutral hover:opacity-70 cursor-default"
+		>
+			<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8">
+				<rect x="7" y="7" width="10" height="10"></rect>
+			</svg>
+		</button>
+	</div>
 }
 
 templ UserMessage(message string) {

@@ -19,10 +19,20 @@ func ChatMessageHandler(w http.ResponseWriter, r *http.Request) {
 
 func ChatMessageButtonHandler(w http.ResponseWriter, r *http.Request) {
 	userMessage := r.FormValue("userMessage")
-	userMstChat := pages.UserMessage(userMessage)
-	userMstChat.Render(r.Context(), w)
+	userMsgChat := pages.UserMessage(userMessage)
+	userMsgChat.Render(r.Context(), w)
 
 	pokemonName := r.FormValue("pokemonName")
 	emptyChatOOB := pages.EmptyInputFormPostSendOOB(pokemonName)
 	emptyChatOOB.Render(r.Context(), w)
+
+	responseBtn := pages.ResponseSendButtonOOB()
+	responseBtn.Render(r.Context(), w)
+
+	// Response Generation via SSE...
+}
+
+func ResetButtonHandler(w http.ResponseWriter, r *http.Request) {
+	disabledBtn := pages.DisabledSendButtonOOB()
+	disabledBtn.Render(r.Context(), w)
 }
