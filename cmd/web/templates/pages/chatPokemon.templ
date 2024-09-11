@@ -15,6 +15,7 @@ templ PokedexChatPokemonPage(pokemon pokedex.Pokemon, userName string, isCollect
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link href="/cmd/web/public/css/output.css" rel="stylesheet"/>
 			<script src="/cmd/web/public/js/htmx.min.js" defer></script>
+			<script src="/cmd/web/public/js/sse.js" defer></script>
 			<title>PokeChat Universe</title>
 		</head>
 		<body class="bg-zinc-600 scroll-smooth overflow-y-scroll">
@@ -192,12 +193,6 @@ templ DisabledSendButton() {
 	</button>
 }
 
-templ DisabledSendButtonOOB() {
-	<div hx-swap-oob="outerHTML:#sendMsgBtn">
-		@DisabledSendButton()
-	</div>
-}
-
 templ ActiveSendButton() {
 	<button
 		id="sendMsgBtn"
@@ -207,22 +202,45 @@ templ ActiveSendButton() {
 	</button>
 }
 
-templ ResponseSendButtonOOB() {
+templ ResponseSendButtonOOB(uniqueID int64) {
 	<div hx-swap-oob="outerHTML:#sendMsgBtn">
 		<button
 			id="sendMsgBtn"
-			class="btn-disabled btn-ghost flex h-10 w-10 items-center justify-center rounded-md bg-neutral hover:opacity-70 cursor-default"
+			class="btn-ghost flex h-10 w-10 items-center justify-center rounded-md bg-neutral hover:opacity-70"
+			hx-ext="sse"
+			sse-connect="/sse"
+			hx-target={ fmt.Sprintf("#pokemonResponse-%d", uniqueID) }
+			sse-swap="message"
+			sse-close="Complete"
+			hx-post="/stopSSE"
+			hx-trigger="click"
 		>
-			<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8">
+			<svg
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-8 w-8"
+				hx-get="/renderBtnUpdate"
+				hx-trigger="sse:Complete"
+				hx-target="#sendMsgBtn"
+				hx-swap="outerHTML scroll:#chatMessages:bottom"
+			>
 				<rect x="7" y="7" width="10" height="10"></rect>
 			</svg>
 		</button>
 	</div>
 }
 
-templ UserMessage(message string) {
+templ UserAndPokemonMessage(message string, uniqueID int64) {
 	<div class="chat chat-end">
 		<div class="chat-bubble chat-bubble-primary">{ message }</div>
+	</div>
+	<div class="chat chat-start">
+		<div
+			id={ fmt.Sprintf("pokemonResponse-%d", uniqueID) }
+			class="chat-bubble"
+		></div>
 	</div>
 }
 

@@ -2,6 +2,7 @@ package chatroutes
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
 )
@@ -18,21 +19,21 @@ func ChatMessageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ChatMessageButtonHandler(w http.ResponseWriter, r *http.Request) {
+	uniqueID := time.Now().UnixNano()
+
 	userMessage := r.FormValue("userMessage")
-	userMsgChat := pages.UserMessage(userMessage)
+	userMsgChat := pages.UserAndPokemonMessage(userMessage, uniqueID)
 	userMsgChat.Render(r.Context(), w)
 
 	pokemonName := r.FormValue("pokemonName")
 	emptyChatOOB := pages.EmptyInputFormPostSendOOB(pokemonName)
 	emptyChatOOB.Render(r.Context(), w)
 
-	responseBtn := pages.ResponseSendButtonOOB()
+	responseBtn := pages.ResponseSendButtonOOB(uniqueID)
 	responseBtn.Render(r.Context(), w)
-
-	// Response Generation via SSE...
 }
 
-func ResetButtonHandler(w http.ResponseWriter, r *http.Request) {
-	disabledBtn := pages.DisabledSendButtonOOB()
+func RenderButtonUpdate(w http.ResponseWriter, r *http.Request) {
+	disabledBtn := pages.DisabledSendButton()
 	disabledBtn.Render(r.Context(), w)
 }

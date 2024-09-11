@@ -241,5 +241,9 @@ func ChatMessageHandlers(mux *http.ServeMux) {
 
 	mux.Handle("/chatMsgBtn", middlewares.IsAuthenticated(http.HandlerFunc(chatroutes.ChatMessageButtonHandler), appConfig))
 
-	mux.Handle("/resetBtn", middlewares.IsAuthenticated(http.HandlerFunc(chatroutes.ResetButtonHandler), appConfig))
+	mux.Handle("/sse", middlewares.IsAuthenticated(http.HandlerFunc(chatroutes.SseHandler), appConfig))
+	
+	mux.Handle("/renderBtnUpdate", middlewares.IsAuthenticated(http.HandlerFunc(chatroutes.RenderButtonUpdate), appConfig))
+
+	mux.Handle("/stopSSE", middlewares.IsAuthenticated(http.HandlerFunc(chatroutes.StopSseHandler), appConfig))
 }
