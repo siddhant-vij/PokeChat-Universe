@@ -18,6 +18,15 @@ type Chat struct {
 	UserPokemonID uuid.UUID
 }
 
+type ChatHistory struct {
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	ChatID    uuid.UUID
+	Sender    string
+	Message   string
+}
+
 type Evolution struct {
 	ID          int32
 	ChainID     int32
