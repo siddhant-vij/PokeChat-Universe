@@ -3,11 +3,12 @@ package pages
 import (
 	"fmt"
 	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/components"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/chat"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
 )
 
-templ PokedexChatPokemonPage(pokemon pokedex.Pokemon, userName string, isCollected bool) {
+templ PokedexChatPokemonPage(pokemon pokedex.Pokemon, userName string, isCollected bool, orderedChatMesssages []chat.ChatMessage) {
 	<!DOCTYPE html>
 	<html>
 		<head>
@@ -22,7 +23,7 @@ templ PokedexChatPokemonPage(pokemon pokedex.Pokemon, userName string, isCollect
 			<div class="flex flex-col w-[1024px] mx-auto h-screen bg-base-100">
 				@components.Header(false, true, "chat")
 				<main id="main" class="flex-grow flex overflow-hidden">
-					@ChatWithPokemonMain(pokemon, userName, isCollected)
+					@ChatWithPokemonMain(pokemon, userName, isCollected, orderedChatMesssages)
 				</main>
 				<hr/>
 				@components.Footer()
@@ -31,10 +32,10 @@ templ PokedexChatPokemonPage(pokemon pokedex.Pokemon, userName string, isCollect
 	</html>
 }
 
-templ ChatWithPokemonMain(pokemon pokedex.Pokemon, userName string, isCollected bool) {
+templ ChatWithPokemonMain(pokemon pokedex.Pokemon, userName string, isCollected bool, orderedChatMesssages []chat.ChatMessage) {
 	<div class="p-8 flex flex-row justify-center gap-8 h-full w-full">
 		@ChatPokemonDetails(pokemon, isCollected)
-		@ChatWindow(utils.FormatName(pokemon.Name), userName, isCollected)
+		@ChatWindow(utils.FormatName(pokemon.Name), userName, isCollected, orderedChatMesssages)
 	</div>
 }
 
@@ -108,10 +109,10 @@ templ ChatPokemonStats(stats, maxStats []int) {
 	}
 }
 
-templ ChatWindow(pokemonName, userName string, isCollected bool) {
+templ ChatWindow(pokemonName, userName string, isCollected bool, orderedChatMesssages []chat.ChatMessage) {
 	<div id="chatWindow" class="basis-7/12 flex flex-col h-full justify-between">
 		if isCollected {
-			@ChatWindowUpdateOnAdd(pokemonName, userName)
+			@ChatWindowUpdateOnAdd(pokemonName, userName, orderedChatMesssages)
 		} else {
 			<div
 				class="p-8 py-2 card card-side justify-center bg-base-300 rounded-none gap-16 items-center overflow-y-auto h-full"
@@ -122,7 +123,7 @@ templ ChatWindow(pokemonName, userName string, isCollected bool) {
 	</div>
 }
 
-templ ChatWindowUpdateOnAdd(pokemonName, userName string) {
+templ ChatWindowUpdateOnAdd(pokemonName, userName string, orderedChatMesssages []chat.ChatMessage) {
 	<div
 		id="chatMessages"
 		class="p-8 flex flex-col justify-start bg-base-300 rounded-none overflow-y-auto h-full"
@@ -136,8 +137,27 @@ templ ChatWindowUpdateOnAdd(pokemonName, userName string) {
 				Send over a message if you want to chat...
 			</div>
 		</div>
+		@ChatHistory(orderedChatMesssages)
 	</div>
 	@ChatMessageForm(pokemonName)
+}
+
+templ ChatHistory(orderedChatMesssages []chat.ChatMessage) {
+	for _, msg := range orderedChatMesssages {
+		if msg.Sender == "user" {
+			<div class="chat chat-end">
+				<div class="chat-bubble chat-bubble-primary">
+					{ msg.Message }
+				</div>
+			</div>
+		} else {
+			<div class="chat chat-start">
+				<div class="chat-bubble">
+					{ msg.Message }
+				</div>
+			</div>
+		}
+	}
 }
 
 templ ChatMessageForm(pokemonName string) {
@@ -202,13 +222,13 @@ templ ActiveSendButton() {
 	</button>
 }
 
-templ ResponseSendButtonOOB(uniqueID int64) {
+templ ResponseSendButtonOOB(uniqueID int64, pokemonName string) {
 	<div hx-swap-oob="outerHTML:#sendMsgBtn">
 		<button
 			id="sendMsgBtn"
 			class="btn-ghost flex h-10 w-10 items-center justify-center rounded-md bg-neutral hover:opacity-70"
 			hx-ext="sse"
-			sse-connect="/sse"
+			sse-connect={ fmt.Sprintf("/sse/%s", pokemonName) }
 			hx-target={ fmt.Sprintf("#pokemonResponse-%d", uniqueID) }
 			sse-swap="message"
 			sse-close="Complete"

@@ -2,9 +2,16 @@ package chatroutes
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
+	"github.com/siddhant-vij/PokeChat-Universe/config"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
 )
 
 var (
@@ -12,7 +19,7 @@ var (
 	stopChannelMu sync.Mutex
 )
 
-func SseHandler(w http.ResponseWriter, r *http.Request) {
+func SseHandler(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
@@ -21,36 +28,65 @@ func SseHandler(w http.ResponseWriter, r *http.Request) {
 	clientGone := r.Context().Done()
 
 	loremIpsum := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-	wordStream := simulateLlmStream(loremIpsum, 50*time.Millisecond)
+	llmStream := simulateLlmStream(loremIpsum, 50*time.Millisecond)
 
+	pokemonName := r.URL.Path[len("/sse/"):]
+	var pokemonResponse string
+
+outerLoop:
 	for {
 		select {
 		case <-clientGone:
 			fmt.Println("Client disconnected")
-			return
+			break outerLoop
 		case <-stopChannel:
 			fmt.Fprintf(w, "event: Complete\n")
 			fmt.Fprintf(w, "data: Stream stopped\n\n")
 			if f, ok := w.(http.Flusher); ok {
 				f.Flush()
 			}
-			return
-		case word, ok := <-wordStream:
+			break outerLoop
+		case character, ok := <-llmStream:
 			if !ok {
 				fmt.Fprintf(w, "event: Complete\n")
 				fmt.Fprintf(w, "data: LLM simulation done!\n\n")
 				if f, ok := w.(http.Flusher); ok {
 					f.Flush()
 				}
-				return
+				break outerLoop
 			}
 
-			fmt.Fprintf(w, "data: %s\n\n", word)
+			pokemonResponse += character
+
+			fmt.Fprintf(w, "data: %s\n\n", character)
 
 			if f, ok := w.(http.Flusher); ok {
 				f.Flush()
 			}
 		}
+	}
+
+	pokemon, err := cfg.DBQueries.GetPokemonDetailsByName(r.Context(), utils.DeformatName(pokemonName))
+	if err != nil {
+		log.Println(err)
+		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+		serverErrorPage.Render(r.Context(), w)
+		return
+	}
+
+	insertChatHistoryParams := pokedex.InsertChatHistoryParams{
+		ID:        uuid.New(),
+		UserID:    cfg.LoggedInUserId,
+		PokemonID: int32(pokemon.ID),
+		Sender:    "ai",
+		Message:   pokemonResponse,
+	}
+	err = cfg.DBQueries.InsertChatHistory(r.Context(), insertChatHistoryParams)
+	if err != nil {
+		log.Println(err)
+		serverErrorPage := pages.ServerErrorPage(cfg.AuthStatus)
+		serverErrorPage.Render(r.Context(), w)
+		return
 	}
 }
 

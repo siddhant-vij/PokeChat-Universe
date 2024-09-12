@@ -239,10 +239,14 @@ func SearchAndSortHandlers(mux *http.ServeMux) {
 func ChatMessageHandlers(mux *http.ServeMux) {
 	mux.Handle("/chatMsg", middlewares.IsAuthenticated(http.HandlerFunc(chatroutes.ChatMessageHandler), appConfig))
 
-	mux.Handle("/chatMsgBtn", middlewares.IsAuthenticated(http.HandlerFunc(chatroutes.ChatMessageButtonHandler), appConfig))
+	mux.Handle("/chatMsgBtn", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		chatroutes.ChatMessageButtonHandler(w, r, appConfig)
+	}), appConfig))
 
-	mux.Handle("/sse", middlewares.IsAuthenticated(http.HandlerFunc(chatroutes.SseHandler), appConfig))
-	
+	mux.Handle("/sse/{pokemonName}", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		chatroutes.SseHandler(w, r, appConfig)
+	}), appConfig))
+
 	mux.Handle("/renderBtnUpdate", middlewares.IsAuthenticated(http.HandlerFunc(chatroutes.RenderButtonUpdate), appConfig))
 
 	mux.Handle("/stopSSE", middlewares.IsAuthenticated(http.HandlerFunc(chatroutes.StopSseHandler), appConfig))
