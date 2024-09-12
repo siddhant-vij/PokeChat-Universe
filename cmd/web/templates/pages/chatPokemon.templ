@@ -222,13 +222,13 @@ templ ActiveSendButton() {
 	</button>
 }
 
-templ ResponseSendButtonOOB(uniqueID int64, pokemonName string) {
+templ ResponseSendButtonOOB(uniqueID int64, pokemonName, userMessage string) {
 	<div hx-swap-oob="outerHTML:#sendMsgBtn">
 		<button
 			id="sendMsgBtn"
 			class="btn-ghost flex h-10 w-10 items-center justify-center rounded-md bg-neutral hover:opacity-70"
 			hx-ext="sse"
-			sse-connect={ fmt.Sprintf("/sse/%s", pokemonName) }
+			sse-connect={ fmt.Sprintf("/sse?pokemonName=%s&userMessage=%s", pokemonName, userMessage) }
 			hx-target={ fmt.Sprintf("#pokemonResponse-%d", uniqueID) }
 			sse-swap="message"
 			sse-close="Complete"

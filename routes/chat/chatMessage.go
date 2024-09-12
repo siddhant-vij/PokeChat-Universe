@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	
 	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
 	"github.com/siddhant-vij/PokeChat-Universe/config"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
@@ -34,7 +35,7 @@ func ChatMessageButtonHandler(w http.ResponseWriter, r *http.Request, cfg *confi
 	emptyChatOOB := pages.EmptyInputFormPostSendOOB(pokemonName)
 	emptyChatOOB.Render(r.Context(), w)
 
-	responseBtn := pages.ResponseSendButtonOOB(uniqueID, pokemonName)
+	responseBtn := pages.ResponseSendButtonOOB(uniqueID, pokemonName, userMessage)
 	responseBtn.Render(r.Context(), w)
 
 	pokemon, err := cfg.DBQueries.GetPokemonDetailsByName(r.Context(), utils.DeformatName(pokemonName))

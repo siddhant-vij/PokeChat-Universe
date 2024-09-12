@@ -5,11 +5,12 @@ import (
 	"log"
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/google/uuid"
+	
 	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
 	"github.com/siddhant-vij/PokeChat-Universe/config"
+	"github.com/siddhant-vij/PokeChat-Universe/controllers/chat"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex/utils"
 )
@@ -27,10 +28,11 @@ func SseHandler(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 
 	clientGone := r.Context().Done()
 
-	loremIpsum := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-	llmStream := simulateLlmStream(loremIpsum, 50*time.Millisecond)
+	pokemonName := r.URL.Query().Get("pokemonName")
 
-	pokemonName := r.URL.Path[len("/sse/"):]
+	userMessage := r.URL.Query().Get("userMessage")
+	llmResponseStream := chat.GenerateChatResponse(userMessage, cfg)
+
 	var pokemonResponse string
 
 outerLoop:
@@ -46,7 +48,7 @@ outerLoop:
 				f.Flush()
 			}
 			break outerLoop
-		case character, ok := <-llmStream:
+		case character, ok := <-llmResponseStream:
 			if !ok {
 				fmt.Fprintf(w, "event: Complete\n")
 				fmt.Fprintf(w, "data: LLM simulation done!\n\n")
@@ -95,18 +97,4 @@ func StopSseHandler(w http.ResponseWriter, r *http.Request) {
 	defer stopChannelMu.Unlock()
 	close(stopChannel)
 	stopChannel = make(chan struct{})
-}
-
-func simulateLlmStream(text string, delay time.Duration) <-chan string {
-	stream := make(chan string)
-
-	go func() {
-		defer close(stream)
-		for _, char := range text {
-			stream <- string(char)
-			time.Sleep(delay)
-		}
-	}()
-
-	return stream
 }

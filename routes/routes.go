@@ -251,7 +251,7 @@ func ChatMessageHandlers(mux *http.ServeMux) {
 		chatroutes.ChatMessageButtonHandler(w, r, appConfig)
 	}), appConfig))
 
-	mux.Handle("/sse/{pokemonName}", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/sse", middlewares.IsAuthenticated(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		chatroutes.SseHandler(w, r, appConfig)
 	}), appConfig))
 
