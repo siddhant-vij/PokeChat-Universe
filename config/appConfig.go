@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/ollama/ollama/api"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/pokedex"
@@ -21,8 +22,9 @@ type AppConfig struct {
 	RedisDatabase string
 	RedisPassword string
 
-	DBQueries   *pokedex.Queries
-	RedisClient *redis.Client
+	DBQueries    *pokedex.Queries
+	RedisClient  *redis.Client
+	OllamaClient *api.Client
 
 	AuthDomain       string
 	ClientID         string

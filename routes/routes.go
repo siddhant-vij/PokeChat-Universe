@@ -22,10 +22,11 @@ import (
 )
 
 var (
-	appConfig    *config.AppConfig
-	dbService    *config.DbService
-	redisService *config.RedisService
-	authService  *auth.Authenticator
+	appConfig     *config.AppConfig
+	dbService     *config.DbService
+	redisService  *config.RedisService
+	ollamaService *config.OllamaService
+	authService   *auth.Authenticator
 )
 
 func init() {
@@ -40,6 +41,9 @@ func init() {
 
 	redisService = config.NewRedisService(appConfig)
 	appConfig.RedisClient = redisService.RedisClient
+
+	ollamaService = config.NewOllamaService()
+	appConfig.OllamaClient = ollamaService.Client
 
 	client.FetchAndInsertRequest(appConfig)
 
@@ -88,6 +92,10 @@ func HealthHandlers(mux *http.ServeMux) {
 
 	mux.HandleFunc("/redisHealth", func(w http.ResponseWriter, r *http.Request) {
 		health.RedisConnectionHealthHandler(w, r, redisService)
+	})
+
+	mux.HandleFunc("/ollamaHealth", func(w http.ResponseWriter, r *http.Request) {
+		health.OllamaConnectionHealthHandler(w, r, ollamaService)
 	})
 }
 

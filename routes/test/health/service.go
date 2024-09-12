@@ -27,3 +27,13 @@ func RedisConnectionHealthHandler(w http.ResponseWriter, r *http.Request, rS *co
 
 	_, _ = w.Write(jsonResp)
 }
+
+func OllamaConnectionHealthHandler(w http.ResponseWriter, r *http.Request, oS *config.OllamaService) {
+	jsonResp, err := json.Marshal(oS.Health())
+
+	if err != nil {
+		log.Fatalf("error handling JSON marshal for ollama. Err: %v", err)
+	}
+
+	_, _ = w.Write(jsonResp)
+}
