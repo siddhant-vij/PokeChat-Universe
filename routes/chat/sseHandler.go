@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	
+
 	"github.com/siddhant-vij/PokeChat-Universe/cmd/web/templates/pages"
 	"github.com/siddhant-vij/PokeChat-Universe/config"
 	"github.com/siddhant-vij/PokeChat-Universe/controllers/chat"
@@ -31,7 +31,7 @@ func SseHandler(w http.ResponseWriter, r *http.Request, cfg *config.AppConfig) {
 	pokemonName := r.URL.Query().Get("pokemonName")
 
 	userMessage := r.URL.Query().Get("userMessage")
-	llmResponseStream := chat.GenerateChatResponse(userMessage, cfg)
+	llmResponseStream := chat.GenerateChatResponse(userMessage, pokemonName, cfg)
 
 	var pokemonResponse string
 
@@ -48,7 +48,7 @@ outerLoop:
 				f.Flush()
 			}
 			break outerLoop
-		case character, ok := <-llmResponseStream:
+		case nextToken, ok := <-llmResponseStream:
 			if !ok {
 				fmt.Fprintf(w, "event: Complete\n")
 				fmt.Fprintf(w, "data: LLM simulation done!\n\n")
@@ -58,9 +58,9 @@ outerLoop:
 				break outerLoop
 			}
 
-			pokemonResponse += character
+			pokemonResponse += nextToken
 
-			fmt.Fprintf(w, "data: %s\n\n", character)
+			fmt.Fprintf(w, "data: %s\n\n", nextToken)
 
 			if f, ok := w.(http.Flusher); ok {
 				f.Flush()

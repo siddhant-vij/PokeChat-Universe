@@ -147,13 +147,13 @@ templ ChatHistory(orderedChatMesssages []chat.ChatMessage) {
 		if msg.Sender == "user" {
 			<div class="chat chat-end">
 				<div class="chat-bubble chat-bubble-primary">
-					{ msg.Message }
+					@templ.Raw(msg.Message)
 				</div>
 			</div>
 		} else {
 			<div class="chat chat-start">
 				<div class="chat-bubble">
-					{ msg.Message }
+					@templ.Raw(msg.Message)
 				</div>
 			</div>
 		}
