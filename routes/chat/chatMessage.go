@@ -32,7 +32,7 @@ func ChatMessageButtonHandler(w http.ResponseWriter, r *http.Request, cfg *confi
 	userMsgChat.Render(r.Context(), w)
 
 	pokemonName := r.FormValue("pokemonName")
-	emptyChatOOB := pages.EmptyInputFormPostSendOOB(pokemonName)
+	emptyChatOOB := pages.EmptyInputFormPostSendOOB(pokemonName, true)
 	emptyChatOOB.Render(r.Context(), w)
 
 	responseBtn := pages.ResponseSendButtonOOB(uniqueID, pokemonName, userMessage)
@@ -65,4 +65,8 @@ func ChatMessageButtonHandler(w http.ResponseWriter, r *http.Request, cfg *confi
 func RenderButtonUpdate(w http.ResponseWriter, r *http.Request) {
 	disabledBtn := pages.DisabledSendButton()
 	disabledBtn.Render(r.Context(), w)
+
+	pokemonName := r.FormValue("pokemonName")
+	emptyChatOOB := pages.EmptyInputFormPostSendOOB(pokemonName, false)
+	emptyChatOOB.Render(r.Context(), w)
 }

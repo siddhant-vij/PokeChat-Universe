@@ -169,29 +169,48 @@ templ ChatMessageForm(pokemonName string) {
 		hx-target="#chatMessages"
 		hx-swap="beforeend"
 		hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, pokemonName) }
+		onsubmit="document.getElementById('msgInput').blur(); return true;"
 	>
-		@EmptyInputFormPostSend(pokemonName)
+		@EmptyInputFormPostSend(pokemonName, false)
 		@DisabledSendButton()
 	</form>
 }
 
-templ EmptyInputFormPostSend(pokemonName string) {
+func pointerEvents(isResponseBeingGenerated bool) string {
+	if isResponseBeingGenerated {
+		return "none"
+	}
+	return "auto"
+}
+
+css isDisabled(isResponseBeingGenerated bool) {
+	pointer-events: { templ.SafeCSSProperty(fmt.Sprintf("%s", pointerEvents(isResponseBeingGenerated))) };
+}
+
+func placeholderText(isResponseBeingGenerated bool, pokemonName string) string {
+	if isResponseBeingGenerated {
+		return "Generating response..."
+	}
+	return fmt.Sprintf("Message %s", pokemonName)
+}
+
+templ EmptyInputFormPostSend(pokemonName string, isResponseBeingGenerated bool) {
 	<input
 		id="msgInput"
 		type="text"
-		placeholder={ fmt.Sprintf("Message %s", pokemonName) }
-		class="input input-bordered input-primary w-96"
+		placeholder={ placeholderText(isResponseBeingGenerated, pokemonName) }
+		class={ "input input-bordered input-primary w-96", isDisabled(isResponseBeingGenerated) }
 		name="userMessage"
-		hx-get="/chatMsg"
+		hx-post="/chatMsg"
 		hx-trigger="input changed delay:100ms"
 		hx-target="#sendMsgBtn"
 		hx-swap="outerHTML"
 	/>
 }
 
-templ EmptyInputFormPostSendOOB(pokemonName string) {
+templ EmptyInputFormPostSendOOB(pokemonName string, isResponseBeingGenerated bool) {
 	<div hx-swap-oob="outerHTML:#msgInput">
-		@EmptyInputFormPostSend(pokemonName)
+		@EmptyInputFormPostSend(pokemonName, isResponseBeingGenerated)
 	</div>
 }
 
@@ -245,6 +264,7 @@ templ ResponseSendButtonOOB(uniqueID int64, pokemonName, userMessage string) {
 				hx-trigger="sse:Complete"
 				hx-target="#sendMsgBtn"
 				hx-swap="outerHTML scroll:#chatMessages:bottom"
+				hx-vals={ fmt.Sprintf(`{"pokemonName": "%s"}`, pokemonName) }
 			>
 				<rect x="7" y="7" width="10" height="10"></rect>
 			</svg>
